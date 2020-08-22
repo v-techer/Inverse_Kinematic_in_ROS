@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="frost">
+  <xacro:include filename="$(find frost_robot_arm)/urdf/frost_arm.xacro"/>
+  <xacro:include filename="$(find frost_robot_arm)/urdf/hand.xacro"/>
+  <xacro:hand ns="frost_arm" right_xyz="0 0.01 0.02" left_xyz="0 -0.01 0.02" rpy="0 ${-pi/2} 0" connected_to="link_5"/>
+</robot>

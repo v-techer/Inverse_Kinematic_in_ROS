@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library path="lib/libfrost_arm_chain_moveit_ikfast_plugin">
+  <class base_class_type="kinematics::KinematicsBase" name="frost_arm_chain/IKFastKinematicsPlugin" type="frost_arm_chain::IKFastKinematicsPlugin">
+    <description>IKFast61 plugin for closed-form kinematics of frost_arm chain</description>
+  </class>
+</library>

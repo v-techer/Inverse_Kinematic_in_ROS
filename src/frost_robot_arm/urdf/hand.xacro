@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<robot name="hand" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="hand" params="connected_to:='' ns:='' rpy:='0 0 0' right_xyz:='0 0.01 0.02' left_xyz:='0 -0.01 0.02' ">
+
+    <xacro:macro name="cube_inertial" params="width height depth mass *origin">
+      <inertial>
+        <mass value="${mass}" />
+        <xacro:insert_block name="origin" />
+        <inertia ixx="${0.0833333 * mass * (height * height + depth * depth)}" ixy="0.0" ixz="0.0"
+          iyy="${0.0833333 * mass * (width * width + depth * depth)}" iyz="0.0"
+          izz="${0.0833333 * mass * (width * width + height * height)}" />
+      </inertial>
+    </xacro:macro>
+
+    <xacro:property name="left_gripper_mass" value="0.020" />
+    <xacro:property name="left_tip_mass" value="0.001" />
+    <xacro:property name="right_gripper_mass" value="0.020" />
+    <xacro:property name="right_tip_mass" value="0.001" />
+
+    <xacro:unless value="${connected_to == ''}">
+      <joint name="left_gripper_joint" type="revolute">
+        <axis xyz="0 0 1"/>
+        <limit effort="1000.0" lower="0.0" upper="0.548" velocity="0.5"/>
+        <origin rpy="${rpy}" xyz="${right_xyz}"/>
+        <parent link="${connected_to}"/>
+        <child link="left_gripper"/>
+        <inertial>
+          <mass value="1.0"/>
+          <inertia ixx="0.015" iyy="0.0375" izz="0.0375" ixy="0" ixz="0" iyz="0"/>
+        </inertial>
+      </joint>
+    </xacro:unless>
+
+    <link name="left_gripper">
+      <visual>
+        <origin rpy="0.0 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://urdf_tutorial/meshes/l_finger.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin rpy="0.0 0 0" xyz="0 0 0"/>
+        <geometry>
+            <mesh filename="package://urdf_tutorial/meshes/l_finger.dae"/>
+        </geometry>
+      </collision>
+      <xacro:cube_inertial width="0.08" depth="0.08" height="0.001" mass="${link_base_mass}">
+      <origin rpy="0.0 0 0" xyz="0 0 0"/>
+    </xacro:cube_inertial>
+    </link>
+
+    <joint name="left_tip_joint" type="fixed">
+      <parent link="left_gripper"/>
+      <child link="left_tip"/>
+      <inertial>
+        <mass value="1.0"/>
+        <inertia ixx="0.015" iyy="0.0375" izz="0.0375" ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </joint>
+
+    <link name="left_tip">
+      <visual>
+        <origin rpy="0.0 0 0" xyz="0.09137 0.00495 0"/>
+        <geometry>
+          <mesh filename="package://urdf_tutorial/meshes/l_finger_tip.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin rpy="0.0 0 0" xyz="0.09137 0.00495 0"/>
+        <geometry>
+            <mesh filename="package://urdf_tutorial/meshes/l_finger_tip.dae"/>
+        </geometry>
+      </collision>
+      <xacro:cube_inertial width="0.08" depth="0.08" height="0.001" mass="${link_base_mass}">
+      <origin rpy="0.0 0 0" xyz="0.09137 0.00495 0" />
+    </xacro:cube_inertial>
+    </link>
+
+    <xacro:unless value="${connected_to == ''}">
+      <joint name="right_gripper_joint" type="revolute">
+        <axis xyz="0 0 -1"/>
+        <limit effort="1000.0" lower="0.0" upper="0.548" velocity="0.5"/>
+        <origin rpy="${rpy}" xyz="${left_xyz}"/>
+        <parent link="${connected_to}"/>
+        <child link="right_gripper"/>
+        <inertial>
+          <mass value="1.0"/>
+          <inertia ixx="0.015" iyy="0.0375" izz="0.0375" ixy="0" ixz="0" iyz="0"/>
+        </inertial>
+      </joint>
+    </xacro:unless>
+
+    <link name="right_gripper">
+      <visual>
+        <origin rpy="-3.1415 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://urdf_tutorial/meshes/l_finger.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin rpy="-3.1415 0 0" xyz="0 0 0"/>
+        <geometry>
+            <mesh filename="package://urdf_tutorial/meshes/l_finger.dae"/>
+        </geometry>
+      </collision>
+      <xacro:cube_inertial width="0.08" depth="0.08" height="0.001" mass="${link_base_mass}">
+      <origin rpy="-3.1415 0 0" xyz="0 0 0" />
+    </xacro:cube_inertial>
+    </link>
+
+    <joint name="right_tip_joint" type="fixed">
+      <parent link="right_gripper"/>
+      <child link="right_tip"/>
+      <inertial>
+        <mass value="1.0"/>
+        <inertia ixx="0.015" iyy="0.0375" izz="0.0375" ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </joint>
+
+    <link name="right_tip">
+      <visual>
+        <origin rpy="-3.1415 0 0" xyz="0.09137 -0.00495 0"/>
+        <geometry>
+          <mesh filename="package://urdf_tutorial/meshes/l_finger_tip.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin rpy="-3.1415 0 0" xyz="0.09137 -0.00495 0"/>
+        <geometry>
+            <mesh filename="package://urdf_tutorial/meshes/l_finger_tip.dae"/>
+        </geometry>
+      </collision>
+      <xacro:cube_inertial width="0.08" depth="0.08" height="0.001" mass="${link_base_mass}">
+      <origin rpy="-3.1415 0 0" xyz="0.09137 -0.00495 0" />
+    </xacro:cube_inertial>
+    </link>
+
+  </xacro:macro>
+</robot>

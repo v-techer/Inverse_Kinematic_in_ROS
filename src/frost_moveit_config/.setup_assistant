@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: frost_robot_arm
+    relative_path: urdf/frost_arm_hand.urdf.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/frost.srdf
+  CONFIG:
+    author_name: Daniel Kusmenko
+    author_email: kusmenko.d@googlemail.com
+    generated_timestamp: 1594914026

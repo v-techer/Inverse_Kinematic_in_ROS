@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<robot name="frost_arm">
+
+  <material name="blue">
+    <color rgba="0 0 0.8 0.7"/>
+  </material>
+  <material name="red">
+    <color rgba="0.8 0 0 1"/>
+  </material>
+
+  <link name="base_link">
+  </link>
+
+  <link name="link_0">
+    <visual>
+      <geometry>
+	<box size="0.1 0.1 0.1"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.05"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	<box size="0.1 0.1 0.05"/>
+      </geometry>
+      <material name="red"/>
+      <origin rpy="0 0 0" xyz="0 0 0.025"/>
+    </collision>
+  </link>
+  <joint name="basejoint" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="link_0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="87" lower="-3.14" upper="3.14" velocity="2.1750"/>
+  </joint>
+  <link name="link_1">
+    <visual>
+      <geometry>
+	<box size="0.1 0.1 0.43"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.215"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	<box size="0.1 0.1 0.35"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.215"/>
+      <material name="red"/>
+    </collision>
+  </link>
+  <joint name="joint1" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.1"/>
+    <parent link="link_0"/>
+    <child link="link_1"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="87" lower="-1.57" upper="1.57" velocity="2.1750"/>
+  </joint>
+  <link name="link_2">
+    <visual>
+      <geometry>
+	<box size="0.08 0.08 0.21"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	<box size="0.08 0.08 0.21"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="red"/>
+    </collision>
+  </link>
+  <joint name="joint2" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.43"/>
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="87" lower="-1.570796" upper="1.570796" velocity="2.1750"/>
+  </joint>
+  <link name="link_3">
+    <visual>
+      <geometry>
+	<box size="0.08 0.08 0.21"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	<box size="0.08 0.08 0.09"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="red"/>
+    </collision>
+  </link>
+  <joint name="joint3" type="revolute">
+    <origin rpy="0 0 0" xyz="0.0 0.0 0.21"/>
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="87" lower="-1.9" upper="1.9" velocity="2.1750"/>
+  </joint>
+  <link name="link_4">
+    <visual>
+      <geometry>
+	<box size="0.08 0.08 0.125"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0625"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	<box size="0.08 0.08 0.125"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0625"/>
+      <material name="red"/>
+    </collision>
+  </link>
+  <joint name="joint4" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0.0 0.21"/>
+    <parent link="link_3"/>
+    <child link="link_4"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="87" lower="-2" upper="2" velocity="2.1750"/>
+  </joint>
+  <link name="link_5">
+    <visual>
+      <geometry>
+	<box size="0.08 0.08 0"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0006"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	<box size="0.08 0.08 0"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0006"/>
+      <material name="red"/>
+    </collision>
+  </link>
+  <joint name="joint5" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.125"/>
+    <parent link="link_4"/>
+    <child link="link_5"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="12" lower="-1.570796" upper="1.570796" velocity="2.6100"/>
+  </joint>
+
+</robot>

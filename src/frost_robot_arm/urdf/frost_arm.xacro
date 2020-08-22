@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<robot name="frost" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <material name="blue">
+    <color rgba="0 0 0.8 0.7"/>
+  </material>
+  <material name="red">
+    <color rgba="0.8 0 0 1"/>
+  </material>
+
+  <xacro:macro name="cube_inertial" params="width height depth mass *origin">
+    <inertial>
+      <mass value="${mass}" />
+      <xacro:insert_block name="origin" />
+      <inertia ixx="${0.0833333 * mass * (height * height + depth * depth)}" ixy="0.0" ixz="0.0"
+        iyy="${0.0833333 * mass * (width * width + depth * depth)}" iyz="0.0"
+        izz="${0.0833333 * mass * (width * width + height * height)}" />
+    </inertial>
+  </xacro:macro>
+
+
+  <xacro:property name="link_base_mass" value="0.500" />
+  <xacro:property name="link_0_mass" value="2.515" />
+  <xacro:property name="link_1_mass" value="5.214" />
+  <xacro:property name="link_2_mass" value="2.581" />
+  <xacro:property name="link_3_mass" value="2.581" />
+  <xacro:property name="link_4_mass" value="1.643" />
+  <xacro:property name="link_5_mass" value="0.200" />
+
+  <link name="world" />
+
+  <!--xacro:unless value="${not connected_to}">
+    <joint name="${arm_id}_joint_${connected_to}" type="fixed">
+      <parent link="${connected_to}"/>
+      <child link="${arm_id}_link0"/>
+      <origin rpy="${rpy}" xyz="${xyz}"/>
+    </joint>
+  </xacro:unless-->
+
+  <joint name="world_joint" type="fixed">
+    <parent link= "world" />
+    <child link= "link_base" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <link name="link_base">
+    <visual>
+      <geometry>
+	      <box size="0.15 0.15 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.005"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	      <box size="0.15 0.15 0.01"/>
+      </geometry>
+      <material name="red"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0025"/>
+    </collision>
+    <xacro:cube_inertial width="0.08" depth="0.08" height="0.001" mass="${link_base_mass}">
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+    </xacro:cube_inertial>
+  </link>
+
+  <link name="link_0">
+    <visual>
+      <geometry>
+	      <box size="0.1 0.1 0.1"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.05"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	      <box size="0.1 0.1 0.1"/>
+      </geometry>
+      <material name="red"/>
+      <origin rpy="0 0 0" xyz="0 0 0.05"/>
+    </collision>
+    <xacro:cube_inertial width="0.08" depth="0.08" height="0.001" mass="${link_0_mass}">
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+    </xacro:cube_inertial>
+  </link>
+
+  <joint name="joint0" type="revolute">
+    <axis xyz="0 0 1"/>
+    <origin rpy="0 0 0" xyz="0 0 0.01"/>
+    <parent link="link_base"/>
+    <child link="link_0"/>
+    <limit effort="87" lower="-3.141592654" upper="3.141592654" velocity="2.1750"/>
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.015" iyy="0.0375" izz="0.0375" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </joint>
+
+  <link name="link_1">
+    <visual>
+      <geometry>
+	      <box size="0.1 0.1 0.43"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.215"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	      <box size="0.1 0.1 0.35"/>
+      </geometry>
+      <material name="red"/>
+      <origin rpy="0 0 0" xyz="0 0 0.215"/>
+    </collision>
+     <xacro:cube_inertial width="0.08" depth="0.08" height="0.001" mass="${link_1_mass}">
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+    </xacro:cube_inertial>
+  </link>
+
+
+  <joint name="joint1" type="revolute">
+    <axis xyz="0 1 0"/>
+    <parent link="link_0"/>
+    <child link="link_1"/>
+    <origin rpy="0 0 0" xyz="0 0 0.1"/>
+    <limit effort="87" lower="-1.570796327" upper="1.570796327" velocity="2.1750"/>
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.015" iyy="0.0375" izz="0.0375" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </joint>
+
+  <link name="link_2">
+    <visual>
+      <geometry>
+        <box size="0.08 0.08 0.21"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.08 0.08 0.21"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="red"/>
+    </collision>
+    <xacro:cube_inertial width="0.08" depth="0.08" height="0.21" mass="${link_2_mass}">
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+    </xacro:cube_inertial>
+  </link>
+
+  <joint name="joint2" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.43"/>
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="87" lower="-2.268928027593" upper="2.617993877991" velocity="2.1750"/>
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.015" iyy="0.0375" izz="0.0375" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </joint>
+
+  <link name="link_3">
+    <visual>
+      <geometry>
+        <box size="0.08 0.08 0.21"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.08 0.08 0.09"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="red"/>
+    </collision>
+    <xacro:cube_inertial width="0.08" depth="0.08" height="0.09" mass="${link_3_mass}">
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+    </xacro:cube_inertial>
+  </link>
+
+
+  <joint name="joint3" type="revolute">
+    <origin rpy="0 0 0" xyz="0.0 0.0 0.21"/>
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="87" lower="-2.705260340591" upper="2.705260340591" velocity="2.1750"/>
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.015" iyy="0.0375" izz="0.0375" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </joint>
+
+
+  <link name="link_4">
+    <visual>
+      <geometry>
+        <box size="0.08 0.08 0.125"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0625"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.08 0.08 0.125"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0625"/>
+      <material name="red"/>
+    </collision>
+    <xacro:cube_inertial width="0.08" depth="0.08" height="0.125" mass="${link_4_mass}">
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+    </xacro:cube_inertial>
+  </link>
+
+
+  <joint name="joint4" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0.0 0.21"/>
+    <parent link="link_3"/>
+    <child link="link_4"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="87" lower="-1.570796326795" upper="1.570796326795" velocity="2.1750"/>
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.015" iyy="0.0375" izz="0.0375" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </joint>
+
+  <link name="link_5">
+    <visual>
+      <geometry>
+        <box size="0.08 0.08 0.001"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0006"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.08 0.08 0"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0006"/>
+      <material name="red"/>
+    </collision>
+    <xacro:cube_inertial width="0.08" depth="0.08" height="0.001" mass="${link_5_mass}">
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+    </xacro:cube_inertial>
+  </link>
+
+
+  <joint name="joint5" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.125"/>
+    <parent link="link_4"/>
+    <child link="link_5"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="12" lower="-3.14159265359" upper="3.14159265359" velocity="2.6100"/>
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.015" iyy="0.0375" izz="0.0375" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </joint>
+</robot>

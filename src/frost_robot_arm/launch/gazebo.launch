@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+<!-- Convert an xacro and put on parameter server -->
+<param name="robot_description" command="$(find xacro)/xacro $(find frost_robot_arm)/urdf/frost_arm_hand.urdf.xacro" />
+
+<!-- Spawn a robot into Gazebo  output="screen"-->
+<node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -z 0.1 -model frost_arm" />
+</launch>

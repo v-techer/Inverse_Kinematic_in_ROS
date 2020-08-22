@@ -1,0 +1,16 @@
+controller_list:
+  - name: fake_frost_arm_controller
+    joints:
+      - joint0
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+  - name: fake_hand_controller
+    joints:
+      - left_gripper_joint
+      - right_gripper_joint
+initial:  # Define initial robot poses.
+  - group: frost_arm
+    pose: straight
