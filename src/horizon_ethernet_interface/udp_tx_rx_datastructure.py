@@ -2,6 +2,8 @@
 
 from config import *
 import rospy
+from std_msgs.msg import String
+from std_msgs.msg import Int16
 from collections import deque
 import struct  # packing and unpacking byte objects in specified c types
 
@@ -10,8 +12,6 @@ import struct  # packing and unpacking byte objects in specified c types
 from horizon_ethernet_interface.msg import GroundstationToRobotarm
 from horizon_ethernet_interface.msg import ArmCoreToRobotarm
 
-
-rospy.init_node(ROS_NODE_NAME, anonymous=True)
 
 class DataClass:
 		
@@ -31,7 +31,7 @@ class DataClass:
 		self.ID_JETSONFUSED = ID_JETSONFUSED
 		self.ID_ARM_CORE = ID_ARM_CORE
 
-	def getAddress(self, raw_data):
+	def getAddress(self):
 		pass
 
 	def parsData(self, raw_data):
@@ -47,6 +47,12 @@ class DataClass:
 		 pass
 	
 	def initRos(self):
+		pass
+
+	def getIndexByKey(self, id_, direction_, key_):
+		pass
+	
+	def getValueByIndex(self, index_):
 		pass
 
 class Groundstation(DataClass):
@@ -264,6 +270,22 @@ class Groundstation(DataClass):
 			# publish message
 			self.groundstation_to_ik_solver.publish(msg)
 
+	def get_byte_string(self):
+	
+		data_in_byte_object = bytes()
+
+		for i, key in enumerate(self.RobotArm_ARM_GS_keys.values()):
+			value = self.getValueByIndex(i, 'TX')
+			if i > 0:
+				value = 44
+			data_in_byte_object += struct.pack(''+self.id2types(self.ID_ARM, 'TX')[i], value)
+
+		return data_in_byte_object
+	
+	def getValueByIndex(self, index_, direction_):
+		if direction_ is 'TX':
+			return self.RobotArm_ARM_GS_list[index_]
+
 	def setValuesInDataList(self, recv_data, id_, direction_):
 		if direction_ is 'RX':
 			if id_ is ID_ARM:
@@ -323,7 +345,7 @@ class ArmCore(DataClass):
 		self.address = ARM_CORE
 		DataClass.__init__(self)
 
-		self.armCore_to_ik_solver = rospy.Publisher('armCore_to_ik_solver', ArmCoreToRobotarm, queue_size=1)
+		self.arm_core_to_ik_solver = rospy.Publisher('arm_core_to_ik_solver', ArmCoreToRobotarm, queue_size=1)
 		self.RobotArm_ARM_TO_ARM_CORE_types = [	'B',
 												'B',
 												'B',
@@ -346,7 +368,7 @@ class ArmCore(DataClass):
 												'i',
 												'i',
 												'i']
-		self.RobotArm_ARM_TO_ARM_CORE_list = [	self.ID_ARM,
+		self.RobotArm_ARM_TO_ARM_CORE_list = [	self.ID_ARM_CORE,
 												0,
 												0,
 												0,
@@ -541,6 +563,8 @@ class ArmCore(DataClass):
 		self.RobotArm_ARM_CORE_TO_ARM = [	self.RobotArm_ARM_CORE_TO_ARM_list,
 											self.RobotArm_ARM_CORE_TO_ARM_types,
 											self.RobotArm_ARM_CORE_TO_ARM_keys]
+	def getAddress(self):
+		return self.address
 
 	def rosSend(self):
 		pass
@@ -557,41 +581,62 @@ class ArmCore(DataClass):
 		self.publishData(rx_id)
 
 	def publishData(self, rx_id):
-		if rx_id == self.ID_ARM:
+		pass
+		if rx_id == self.ID_ARM_CORE:
 			# create message
 			msg = ArmCoreToRobotarm()
 			temp_dict = self.id2lists(rx_id, 'RX')
 
-			msg.dataID = self.getIndexByKey(rx_id, 'RX', 'dataID')
-			msg.operationEnabled = self.getIndexByKey(rx_id, 'RX', 'operationEnabled')
-			msg.actualMode = self.getIndexByKey(rx_id, 'RX', 'actualMode')
-			msg.Endeffector_IsOpen = self.getIndexByKey(rx_id, 'RX', 'Endeffector_IsOpen')
-			msg.actualPositions = [	self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle1'), self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle2'),
-									self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle3'), self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle4'),
-									self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle5'), self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle6'),]
-			msg.actualVelocities = [ self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity1'), self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity2'),
-									 self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity3'), self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity4'),
-									 self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity5'), self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity6'),]
-			msg.HomeOffset = [	self.getIndexByKey(rx_id, 'RX', 'HomeOffset1'), self.getIndexByKey(rx_id, 'RX', 'HomeOffset2'),
-								self.getIndexByKey(rx_id, 'RX', 'HomeOffset3'), self.getIndexByKey(rx_id, 'RX', 'HomeOffset4'),
-								self.getIndexByKey(rx_id, 'RX', 'HomeOffset5'), self.getIndexByKey(rx_id, 'RX', 'HomeOffset6'),]
-			msg.targetPositions = [ self.getIndexByKey(rx_id, 'RX', 'targetJointAngle1'), self.getIndexByKey(rx_id, 'RX', 'targetJointAngle2'),
-									self.getIndexByKey(rx_id, 'RX', 'targetJointAngle3'), self.getIndexByKey(rx_id, 'RX', 'targetJointAngle4'),
-									self.getIndexByKey(rx_id, 'RX', 'targetJointAngle5'), self.getIndexByKey(rx_id, 'RX', 'targetJointAngle6'),]
-			msg.targetVelocities = [ self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity1'), self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity2'),
-									 self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity3'), self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity4'),
-									 self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity5'), self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity6'),]
-			msg.targetAcceleration  = [ self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration1'), self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration2'),
-									 	self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration3'), self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration4'),
-									 	self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration5'), self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration6'),]
-			msg.PositionReached = [ self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition1'), self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition2'),
-									self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition3'), self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition4'),
-									self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition5'), self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition6'),]
+			msg.dataID = self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'dataID'), 'RX')
+			msg.operationEnabled = self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'operationEnabled'), 'RX')
+			msg.actualMode = self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'actualMode'), 'RX')
+			msg.Endeffector_IsOpen = self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'Endeffector_IsOpen'), 'RX')
+			msg.actualPositions = [	self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle1'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle2'), 'RX'),
+									self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle3'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle4'), 'RX'),
+									self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle5'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'acutalJointAngle6'), 'RX')]
+			msg.actualVelocities = [ self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity1'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity2'), 'RX'),
+									 self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity3'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity4'), 'RX'),
+									 self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity5'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'actualJointVelocity6'), 'RX')]
+			msg.HomeOffset = [	self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'HomeOffset1'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'HomeOffset2'), 'RX'),
+								self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'HomeOffset3'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'HomeOffset4'), 'RX'),
+								self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'HomeOffset5'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'HomeOffset6'), 'RX')]
+			msg.targetPositions = [ self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAngle1'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAngle2'), 'RX'),
+									self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAngle3'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAngle4'), 'RX'),
+									self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAngle5'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAngle6'), 'RX')]
+			msg.targetVelocities = [ self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity1'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity2'), 'RX'),
+									 self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity3'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity4'), 'RX'),
+									 self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity5'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointVelocity6'), 'RX')]
+			msg.targetAcceleration  = [ self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration1'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration2'), 'RX'),
+									 	self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration3'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration4'), 'RX'),
+									 	self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration5'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'targetJointAcceleration6'), 'RX')]
+			msg.PositionReached = [ self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition1'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition2'), 'RX'),
+									self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition3'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition4'), 'RX'),
+									self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition5'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition6'), 'RX')]
 			msg.dummy = [0, 0]
+			
 			rospy.loginfo(msg)
 			
 			# publish message
-			self.armCore_to_ik_solver.publish(msg)
+			self.arm_core_to_ik_solver.publish(msg)
+
+	def get_byte_string(self):
+		
+		data_in_byte_object = bytes()
+
+		for i, key in enumerate(self.RobotArm_ARM_TO_ARM_CORE_keys.values()):
+
+			value = self.getValueByIndex(i, 'TX')
+
+			data_in_byte_object += struct.pack(''+self.id2types(self.ID_ARM_CORE, 'TX')[i], value)
+
+		return data_in_byte_object
+	
+	def getValueByIndex(self, index_, direction_):
+		if direction_ is 'RX':
+			return self.RobotArm_ARM_CORE_TO_ARM_list[index_]
+			
+		elif direction_ is 'TX':
+			return self.RobotArm_ARM_TO_ARM_CORE_list[index_]
 
 	def setValuesInDataList(self, recv_data, id_, direction_):
 		if direction_ is 'RX':
@@ -602,6 +647,10 @@ class ArmCore(DataClass):
 		if direction_ is 'RX':
 			if id_ is ID_ARM_CORE:
 				return self.RobotArm_ARM_CORE_TO_ARM_keys[key_]
+		
+		if direction_ is 'TX':
+			if id_ is ID_ARM_CORE:
+				return self.RobotArm_ARM_TO_ARM_CORE_keys[key_]
 
 	def id2types(self, id_, direction_):
 
@@ -626,11 +675,14 @@ class ArmCore(DataClass):
 							}
 		return switcher.get(id_, "WARNING: id2keys -> invalid ID")
 
-	def id2lists(self, id_):
-		#get the array of the lists of the correspending type
-		switcher = {	self.ID_ARM_CORE: self.RobotArm_ARM_TO_ARM_CORE,
-						self.ID_ARM_CORE: self.RobotArm_ARM_CORE_TO_ARM
-						}
+	def id2lists(self, id_, direction_):
+		if direction_ is 'RX':
+			#get the array of the lists of the correspending type
+			switcher = {	self.ID_ARM_CORE: self.RobotArm_ARM_CORE_TO_ARM
+							}
+		elif direction_ is 'TX':
+			switcher = {	self.ID_ARM_CORE: self.RobotArm_ARM_TO_ARM_CORE
+							}
 		return switcher.get(id_, "WARNING: id2lists -> invalid ID")
 
 
@@ -688,6 +740,19 @@ class IOcore(DataClass):
 
 	def getAddress(self):
 		return self.address
+
+	def getValueByIndex(self, index_, direction_):
+		if direction_ is 'TX':
+			return self.RobotArm_ARM_TO_ARM_CORE_list[index_]
+
+	def getIndexByKey(self, id_, direction_, key_):
+		if direction_ is 'RX':
+			if id_ is ID_ARM_CORE:
+				return self.RobotArm_ARM_CORE_TO_ARM_keys[key_]
+		
+		if direction_ is 'TX':
+			if id_ is ID_ARM_CORE:
+				return self.RobotArm_ARM_TO_ARM_CORE_keys[key_]
 
 	def id2types(self, id_, direction_):
 

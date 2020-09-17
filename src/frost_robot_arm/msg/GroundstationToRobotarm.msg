@@ -11,7 +11,7 @@ int16 target_pitch
 int16 target_yaw
 uint8 gripper_status
 uint8 movementStarted
-uint8 collision
+uint8 collisionDetection
 uint8 dummy0
 uint8 dummy1
 uint8 dummy2

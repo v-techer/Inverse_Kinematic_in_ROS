@@ -196,31 +196,34 @@ typedef enum
 typedef enum
 {
 	 /*CHANGE SE 08.07.2019 */
-	 ROBOTARMTP_HOME =1
-	,ROBOTARMTP_FRONT
-	,ROBOTARMTP_LEFT
-	,ROBOTARMTP_RIGHT
-	,ROBOTARMTP_CONTAINERX
-	,ROBOTARMTP_CONTAINERY
-	,ROBOTARMTP_CONTAINERZ
+	ROBOTARMTP_UNDEFINED =-1,
+	ROBOTARMTP_HOME =0,
+	ROBOTARMTP_FRONT,
+	ROBOTARMTP_LEFT,
+	ROBOTARMTP_RIGHT,
+	ROBOTARMTP_CONTAINERX,
+	ROBOTARMTP_CONTAINERY,
+	ROBOTARMTP_CONTAINERZ,
+	ROBOTARMTP_MAX_LOCAL_TPS
 }globalData_enumTypeDef_robotArmTeachedPos;
 
 typedef enum
 {
 	 /*CHANGE SE 08.07.2019 */
-	 ROBOTARMAXIS_1	=1
-	,ROBOTARMAXIS_2
-	,ROBOTARMAXIS_3
-	,ROBOTARMAXIS_4
-	,ROBOTARMAXIS_5
-	,ROBOTARMAXIS_6
-	,ROBOTARMAXIS_7
+	ROBOTARMAXIS_UNDEFINED =-1,
+	ROBOTARMAXIS_1,
+	ROBOTARMAXIS_2,
+	ROBOTARMAXIS_3,
+	ROBOTARMAXIS_4,
+	ROBOTARMAXIS_5,
+	ROBOTARMAXIS_6,
+	ROBOTARMAXIS_MAX_LOCAL_AXIS
 }globalData_enumTypeDef_robotArmAxis;
 
 typedef enum
 {
 	 /*CHANGE SE 08.07.2019 */
-	ROBOTARM2BUTTONS_DISABLE	=1
+	ROBOTARM2BUTTONS_DISABLE	=0
    ,ROBOTARM2BUTTONS_ON_OPEN_LEFT
    ,ROBOTARM2BUTTONS_OFF_CLOSE_RIGHT
 }globalData_enumTypeDef_robotArm2Buttons;
@@ -283,7 +286,7 @@ typedef enum
 
 typedef enum
 {
-	 ROBOTARMFLAG_TRUE = 1
+	 ROBOTARMFLAG_TRUE = 0
 	,ROBOTARMFLAG_FALSE
 }globalData_enumTypeDef_robotArmFlag;
 
@@ -368,7 +371,7 @@ typedef struct /*CHANGE SE 08.07.2019 */
 	globalData_typeDef_robotArm_posTransformation targetCoordinate;
 	globalData_enumTypeDef_robotArmgripperStatus endEffectorState;
 	uint8_t movementStarted;
-	uint8_t collision;
+	uint8_t collisionDetection;
 	uint8_t dummy0;
 	uint8_t dummy1;
 	uint8_t dummy2;
@@ -457,11 +460,19 @@ typedef struct
     int32_t JointAngle6;          // 0 ... 36000°/100
 }globalData_typeDef_robotArmPositioning;
 
+typedef enum
+{
+	 /*CHANGE CM 14.07.2020 */
+	 ROBOTARMMODE_NONE =0
+	,ROBOTARMMODE_POSITION
+	,ROBOTARMMODE_VELOCITY
+}globalData_enumTypeDef_robotArmCoreMode;
+
 typedef struct
 {
 	uint8_t dataID;
 	uint8_t  operationEnabled;					// enable / disable
-	globalData_enumTypeDef_robotArmMode actualMode;               // see enum typedef
+	globalData_enumTypeDef_robotArmCoreMode actualArmCoreMode; // see enum typedef
     uint8_t Endeffector_IsOpen;                             // 1: open, 0: close
     globalData_typeDef_robotArmPositioning actualPositions;
     globalData_typeDef_robotArmVelocity actualVelocities;
@@ -477,7 +488,7 @@ typedef struct
 {
 	uint8_t dataID;
 	uint8_t operationEnable;
-	globalData_enumTypeDef_robotArmMode mode;				// see enum typedef
+	globalData_enumTypeDef_robotArmCoreMode targetArmCoreMode; // see enum typedef
     uint8_t Endeffector_open;                               // 1: open, 0: close
     globalData_typeDef_robotArmPositioning targetPositions;
     globalData_typeDef_robotArmVelocity targetVelocities;

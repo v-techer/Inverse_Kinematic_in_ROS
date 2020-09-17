@@ -11,6 +11,7 @@ private:
     globalData_enumTypeDef_robotArmMode m_currentMode;
     globalData_enumTypeDef_robotArmAxis m_currentAxe;
     globalData_typeDef_robotArm_GS_ARM m_newData;
+    globalData_typeDef_robotArm_GS_ARM m_oldData;
     bool m_newDataFlag;
     void receiveDataCallback(const frost_robot_arm::GroundstationToRobotarm::ConstPtr& msg);
     ros::NodeHandle* m_rosNode;

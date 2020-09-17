@@ -7,7 +7,7 @@ controller_list:
       - joint3
       - joint4
       - joint5
-  - name: fake_hand_controller
+  - name: fake_frost_hand_controller
     joints:
       - left_gripper_joint
       - right_gripper_joint

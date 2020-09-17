@@ -65,6 +65,8 @@ qtcreator-*
 # ros related stuff
 build/*
 devel/*
+build_isolated/*
+devel_isolated/*
 .catkin_tools/*
 .catkin_workspace
 logs/*

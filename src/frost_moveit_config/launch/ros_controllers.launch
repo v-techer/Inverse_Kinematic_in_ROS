@@ -6,9 +6,6 @@
 
   <!-- Load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args="arm_position_controller hand_controller "/>
-
-    <!-- convert joint states to TF transforms for rviz, etc -->
-    <remap from="/joint_states" to="/robot/joint_states" />
+    output="screen" args=""/>
 
 </launch>

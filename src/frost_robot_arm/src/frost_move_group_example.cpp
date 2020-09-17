@@ -42,163 +42,15 @@
 
 #include <moveit_msgs/AttachedCollisionObject.h>
 #include <moveit_msgs/CollisionObject.h>
-#include <tf2/LinearMath/Quaternion.h>
-
 
 #include <moveit_visual_tools/moveit_visual_tools.h>
 
-#include <stdio.h>
-
-#include "ros/ros.h"
-#include "std_msgs/String.h"
-#include "std_msgs/Int16.h"
-
-
- #include "ground_station.h"
- #include "state_machine.h"
- #include "system.h"
-
-
-
-const double pi = 3.141592654;
-
 int main(int argc, char** argv)
 {
-
-  ROS_INFO("TEST DEBUG");
-  StateMachine st;
-  System sys(argc, argv);
-  Groundstation gnd(argc, argv);
-
-  /* The state machine hase 3 types of states and 4 type of modes.
-   * The state machine contains the state Stoped, Run and ReadyToRun.
-   * in the first mode: Axes mode does contain the states Stoped and
-   * Run. A Transition from Stoped to Run can be acomplished by
-   * activating movement enabled. A transtion back will be acomplished
-   * if the user disables the movement enable. 
-   * 
-  */
-
-  while(1)
-  {
-    /*check if movemened is enabled if not dont move the robotarm*/
-    if (gnd.movementWasStarted())
-    {
-      /* if its true then start the movemenet*/
-      st.triggerStartMovement();
-    }
-    else
-    {
-      /* if it s false then stop any movemenet*/
-      st.triggerStopMovement();
-    }
-
-    /*check if the mode was changed to the modes:
-    Joint Move, Cartesian Move, Cartesian Position or Teached Position*/
-    if (gnd.modeWasChanged())
-    {
-      /*if mode was changed update the statemachin for further */
-      st.triggerModeChange(gnd.getCurrentMode());
-    }
-
-    /* go in to current mode Axe Mode*/
-    if (st.currentModeAxeMode())
-    {
-      if (st.statusIsRunning())
-      {
-        sys.moveAxe(gnd.getAxe(), gnd.getVelocitiy());
-      }
-
-      if (st.statusIsStopped())
-      {
-        sys.stopMovement();
-      }
-    }
-
-    if (st.currentModeTeachedPosMode())
-    {
-      // if (st.statusIsReadyToRun() )
-      // {
-      //   if (gnd.movementWasStarted)
-      //   if ( sys.furtherTrajectoryPoints())
-      //   {
-      //     st.triggerStartMovement();
-      //   }
-      // }
-
-      if (st.statusIsRunning())
-      {
-          sys.driveToTeachedPosition(gnd.getTeachedPosition());
-
-        if (sys.positionWasReached())
-        {
-          st.triggerStopMovement();
-        }
-      }
-
-      if (st.statusIsStopped())
-      {
-        sys.stopMovement();
-      }
-    }
-
-    if (st.currentModePosMode())
-    {
-      if (st.statusIsRunning())
-      {
-        sys.driveToPosition(gnd.getPosition());
-
-        if (sys.positionWasReached())
-        {
-          st.triggerPositionReached();
-        }
-      }
-
-      if (st.statusIsStopped())
-      {
-        sys.stopMovement();
-      }
-    }
-
-    if (st.currentModeJoyMode())
-    {
-
-      if (st.statusIsRunning())
-      {
-        if (gnd.newJoyMovement())
-        {
-          sys.driveToPosition(sys.calcNewPosition(gnd.getJoyMovement()));
-
-          st.triggerNextPosition();
-        }
-
-        if(sys.positionWasReached())
-        {
-          st.triggerPositionReached();
-        }
-      }
-
-      if (st.statusIsReadyToRun())
-      {
-        if (gnd.newJoyMovement())
-        {
-          sys.driveToPosition(sys.calcNewPosition(gnd.getJoyMovement()));
-
-          st.triggerNextPosition();
-        }
-      }
-
-      if (st.statusIsStopped())
-      {
-        sys.stopMovement();
-      }
-    }
-  }
-
-  // ros::init(argc, argv, "frost_move_group");
-  // ros::NodeHandle node_handle;
-  // ros::AsyncSpinner spinner(1);
-  // spinner.start();
+  ros::init(argc, argv, "frost_move_group");
+  ros::NodeHandle node_handle;
+  ros::AsyncSpinner spinner(1);
+  spinner.start();
 
   // BEGIN_TUTORIAL
   //
@@ -262,11 +114,12 @@ int main(int argc, char** argv)
   visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to start the demo");
 
   // Planning to a Pose goal
-  // ^^^^^^^^^^^^^^^^^^^^^^^  if (success)
-    move_group.move();
+  // ^^^^^^^^^^^^^^^^^^^^^^^
   // We can plan a motion for this group to a desired pose for the
   // end-effector.
-  geometry_msgs::Pose target_pose1;
+
+/* OWN PLAYGROUND FROM DANIEL
+geometry_msgs::Pose target_pose1;
 
   tf2::Quaternion myQuaternion;
 
@@ -279,36 +132,6 @@ int main(int argc, char** argv)
   target_pose1.position.x = 0.68;
   target_pose1.position.y = -0;
   target_pose1.position.z = 0.65;
-
-  move_group.setPoseTarget(target_pose1);
-
-  ROS_INFO("w = %f, x = %f, y = %f, z = %f ", myQuaternion.getW(), myQuaternion.getX(), myQuaternion.getY(), myQuaternion.getZ());
-
-  // std::vector<geometry_msgs::PoseStamped> *pose
-
-  // pose = move_group.getPoseTargets("link_5");
-
-  // Now, we call the planner to compute the plan and visualize it.
-  // Note that we are just planning, not asking move_group
-  // to actually move the robot.
-  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-
-  bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-  
-  if (success)
-    move_group.move();
-
-  ROS_INFO_NAMED("tutorial", "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
-
-  myQuaternion.setEuler( 0, 0, 0 );
-
-  target_pose1.orientation.w = myQuaternion.getW();
-  target_pose1.orientation.x = myQuaternion.getX();
-  target_pose1.orientation.y = myQuaternion.getY();
-  target_pose1.orientation.z = myQuaternion.getZ();
-  target_pose1.position.x = 0;
-  target_pose1.position.y = 0;
-  target_pose1.position.z = 1.08;
 
   //move_group.setNamedTarget("home");
 
@@ -324,8 +147,21 @@ int main(int argc, char** argv)
   // Note that we are just planning, not asking move_group
   // to actually move the robot.
 
+*/
 
-  success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+  geometry_msgs::Pose target_pose1;
+  target_pose1.orientation.w = -1.0;
+  target_pose1.position.x = 0.4;
+  target_pose1.position.y = -0.2;
+  target_pose1.position.z = 0.8;
+  move_group.setPoseTarget(target_pose1);
+
+  // Now, we call the planner to compute the plan and visualize it.
+  // Note that we are just planning, not asking move_group
+  // to actually move the robot.
+  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
+  bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
   ROS_INFO_NAMED("tutorial", "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
 
@@ -444,22 +280,24 @@ int main(int argc, char** argv)
   // from the new start state above.  The initial pose (start state) does not
   // need to be added to the waypoint list but adding it can help with visualizations
   std::vector<geometry_msgs::Pose> waypoints;
-
+  /* OWN CODE JUST FOR PLAYING
   myQuaternion.setEuler( pi/2, 0, 0 );
   start_pose2.orientation.w = myQuaternion.getW();
   start_pose2.orientation.x = myQuaternion.getX();
   start_pose2.orientation.y = myQuaternion.getY();
   start_pose2.orientation.z = myQuaternion.getZ();
+  */
   waypoints.push_back(start_pose2);
 
   geometry_msgs::Pose target_pose3 = start_pose2;
 
   target_pose3.position.z -= 0.2;
-
+/* OWN CODE JUST FOR PLAYING
   target_pose3.orientation.w = myQuaternion.getW();
   target_pose3.orientation.x = myQuaternion.getX();
   target_pose3.orientation.y = myQuaternion.getY();
   target_pose3.orientation.z = myQuaternion.getZ();
+*/
   waypoints.push_back(target_pose3);  // down
 
   target_pose3.position.y -= 0.2;

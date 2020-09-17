@@ -3,10 +3,10 @@
   <name>frost_moveit_config</name>
   <version>0.3.0</version>
   <description>
-     An automatically generated package with all the configuration and launch files for using the frost with the MoveIt Motion Planning Framework
+     An automatically generated package with all the configuration and launch files for using the frost with the MoveIt! Motion Planning Framework
   </description>
-  <author email="kusmenko.d@googlemail.com">Daniel Kusmenko</author>
-  <maintainer email="kusmenko.d@googlemail.com">Daniel Kusmenko</maintainer>
+  <author email="kusmenko@stud.fra-uas.de">daniel kusmenko</author>
+  <maintainer email="kusmenko@stud.fra-uas.de">daniel kusmenko</maintainer>
 
   <license>BSD</license>
 
@@ -28,8 +28,7 @@
   <run_depend>xacro</run_depend>
   <!-- This package is referenced in the warehouse launch files, but does not build out of the box at the moment. Commented the dependency until this works. -->
   <!-- <run_depend>warehouse_ros_mongo</run_depend> -->
-  <build_depend>frost_robot_arm</build_depend>
-  <run_depend>frost_robot_arm</run_depend>
+    <run_depend>frost_robot_arm</run_depend>
 
 
 </package>

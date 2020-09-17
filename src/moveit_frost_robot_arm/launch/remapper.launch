@@ -1,5 +1,0 @@
-<launch>
-	<node pkg="moveit_frost_robot_arm" type="move_group" name="remapper" output="screen">
-	  <remap from="joint_states" to="robot/joint_states"/>
-	</node>
-</launch>

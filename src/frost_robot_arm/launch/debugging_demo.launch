@@ -26,7 +26,7 @@
   </include>
 
   <!-- If needed, broadcast static tf for robot root -->
-  <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_1" args="0 0 0 0 0 0 world world" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_1" args="0 0 0 0 0 0 world joint0" />
 
   <!-- We do not have a robot connected, so publish fake joint states -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
@@ -57,5 +57,9 @@
   <include file="$(find frost_moveit_config)/launch/default_warehouse_db.launch" if="$(arg db)">
     <arg name="moveit_warehouse_database_path" value="$(arg db_path)"/>
   </include>
+
+  <!-- launch now the frost_move_grou_example file it contains the example movemtn for the frost robot arm-->
+  <node name="frost_move_group_exmaple" pkg="frost_robot_arm" type="frost_move_group_example" respawn="false" output="screen">
+  </node>
 
 </launch>
