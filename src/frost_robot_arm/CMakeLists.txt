@@ -25,6 +25,7 @@ find_package(catkin REQUIRED
 )
 
 find_package(Eigen3 REQUIRED)
+find_package(tf2 REQUIRED)
 find_package(Boost REQUIRED system filesystem date_time thread)
 
 

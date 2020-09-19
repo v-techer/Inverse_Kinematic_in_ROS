@@ -5,16 +5,21 @@
 #include <stdint.h>
 
 
-    StateMachine::StateMachine()
+    StateMachine::StateMachine():
+    m_currentMode(-1),
+    m_currentState(-1)
     {
-        m_currentMode = ROBOTARMMODE_UNDEFINED;
-        m_currentState = ST_UNDEFINED;
+        
     }
     StateMachine::~StateMachine()
     {
 
     }
 
+    void StateMachine::initStateMachine()
+    {
+        enterStateStoped();
+    }
 
     void StateMachine::enterStateRunning()
     {
@@ -31,16 +36,18 @@
         m_currentState = ST_STOPED;
     }
 
-    void StateMachine::triggerModeChange(globalData_enumTypeDef_robotArmMode newMode)
+    void StateMachine::triggerModeChange(int newMode)
     {
         m_currentMode = newMode;
     }
     
     void StateMachine::triggerStartMovement()
     {   
-        if ((m_currentState == ST_STOPED) || (m_currentState == ST_UNDEFINED))
+        if ((m_currentState == ST_STOPED))
         {
-            if (m_currentMode == ROBOTARMMODE_JOY)
+            if (m_currentMode == ROBOTARMMODE_JOY ||
+                m_currentMode == ROBOTARMMODE_TEACHED_POS ||
+                m_currentMode == ROBOTARMMODE_POSITION)
             {
                 enterStateReadyToRun();
             }
@@ -61,7 +68,9 @@
     {
         if (m_currentState == ST_RUNNING)
         {
-            if (m_currentMode == ROBOTARMMODE_JOY)
+            if (m_currentMode == ROBOTARMMODE_JOY ||
+            m_currentMode == ROBOTARMMODE_TEACHED_POS ||
+            m_currentMode == ROBOTARMMODE_POSITION)
                 enterStateReadyToRun();
             else
                 enterStateStoped();
@@ -101,7 +110,7 @@
 
     bool StateMachine::currentModePosMode()
     {
-        return (m_currentMode == ROBOTARMMODE_POSTION);
+        return (m_currentMode == ROBOTARMMODE_POSITION);
     }
 
     bool StateMachine::currentModeTeachedPosMode()

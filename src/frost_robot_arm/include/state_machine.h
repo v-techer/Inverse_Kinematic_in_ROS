@@ -7,7 +7,6 @@ class StateMachine
 private:
     enum LOCAL_STATES
     {  
-        ST_UNDEFINED = -1,
         ST_STOPED = 0,
         ST_READY_TO_RUN,
         ST_RUNNING,
@@ -16,14 +15,15 @@ private:
 
 
     int m_currentState;
-    globalData_enumTypeDef_robotArmMode m_currentMode;
+    int m_currentMode;
 
     void enterStateStoped();
     void enterStateRunning();
     void enterStateReadyToRun();
 
 public:
-    void triggerModeChange(globalData_enumTypeDef_robotArmMode newMode);
+    void initStateMachine();
+    void triggerModeChange(int newMode);
     void triggerStartMovement();
     void triggerStopMovement();
     void triggerPositionReached();

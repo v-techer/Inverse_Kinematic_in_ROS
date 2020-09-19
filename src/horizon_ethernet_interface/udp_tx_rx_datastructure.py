@@ -134,7 +134,7 @@ class Groundstation(DataClass):
 										"target_yaw": 10,
 										"endEffectorState" : 11,
 										"movementStarted": 12,	
-										"collision": 13,
+										"collisionDetection": 13,
 										"dummy0": 14,
 										"dummy1": 15,
 										"dummy2":16}
@@ -261,7 +261,7 @@ class Groundstation(DataClass):
 			msg.target_yaw = temp_dict[self.getIndexByKey(rx_id, 'RX', 'target_yaw')]
 			msg.gripper_status = temp_dict[self.getIndexByKey(rx_id, 'RX', 'endEffectorState')]
 			msg.movementStarted = temp_dict[self.getIndexByKey(rx_id, 'RX', 'movementStarted')]
-			msg.collision = temp_dict[self.getIndexByKey(rx_id, 'RX', 'collision')]
+			msg.collisionDetection = temp_dict[self.getIndexByKey(rx_id, 'RX', 'collisionDetection')]
 			msg.dummy0 = temp_dict[self.getIndexByKey(rx_id, 'RX', 'dummy0')]
 			msg.dummy1 = temp_dict[self.getIndexByKey(rx_id, 'RX', 'dummy1')]
 			msg.dummy2 = temp_dict[self.getIndexByKey(rx_id, 'RX', 'dummy2')]

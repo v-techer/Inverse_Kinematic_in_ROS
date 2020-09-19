@@ -78,59 +78,122 @@ int main(int argc, char** argv)
    * if the user disables the movement enable. 
    * 
   */
+  st.initStateMachine();
+  gnd.initGroundstation();
 
   while(1)
   {
-    /*check if movemened is enabled if not dont move the robotarm*/
-    if (gnd.movementWasStarted())
-    {
-      /* if its true then start the movemenet*/
-      st.triggerStartMovement();
-    }
-    else
-    {
-      /* if it s false then stop any movemenet*/
-      st.triggerStopMovement();
-    }
+
+    sys.setEndeffectorClosed(gnd.getEndEffectorState());
 
     /*check if the mode was changed to the modes:
     Joint Move, Cartesian Move, Cartesian Position or Teached Position*/
     if (gnd.modeWasChanged())
     {
-      /*if mode was changed update the statemachin for further */
+      /*if mode was changed update the statemachin for further processing */
       st.triggerModeChange(gnd.getCurrentMode());
     }
 
     /* go in to current mode Axe Mode*/
     if (st.currentModeAxeMode())
     {
+      // set the arm core mode to position mode
+      sys.setArmCoreMode(ROBOTARMCOREMODE_VELOCITY);
+
       if (st.statusIsRunning())
       {
-        sys.moveAxe(gnd.getAxe(), gnd.getVelocitiy());
+
+        if (gnd.movementIsEnabled())
+        {
+          // enabele operation
+          sys.setOperationEnable(true);
+
+          sys.setTargetVelocitiy(gnd.getVelocitiy());
+        }
+        else
+          st.triggerStopMovement();
       }
 
       if (st.statusIsStopped())
       {
-        sys.stopMovement();
+        if (gnd.movementIsEnabled())
+         st.triggerStartMovement();
+        
+        else
+          sys.setOperationEnable(false);
       }
     }
 
     if (st.currentModeTeachedPosMode())
     {
-      // if (st.statusIsReadyToRun() )
-      // {
-      //   if (gnd.movementWasStarted)
-      //   if ( sys.furtherTrajectoryPoints())
-      //   {
-      //     st.triggerStartMovement();
-      //   }
-      // }
+      // set the arm core mode to position mode
+      sys.setArmCoreMode(ROBOTARMCOREMODE_POSITION);
+
+      if (st.statusIsReadyToRun() )
+      {
+        // is movement enabled
+        if (gnd.movementIsEnabled() )
+        {
+
+          // check if position has changed
+          if ( gnd.newTeachedPosition() )
+          {
+            // calucalte new position
+            sys.calcNewTrajectory(gnd.getTeachedPosition(), gnd.isCollisionDetectionEnabled());
+              
+          }
+          else
+          {
+            // if there is no new position check if list of trajectory has
+            // some further entrence
+            if ( sys.furtherTrajectoriePoints() )
+            {
+              // if end position not reached, change to state run and
+              // send the current position until reached
+              st.triggerNextPosition();
+            }
+            else
+            {
+              // if there is no new position and or the tracetrory list is empty
+              // change to state stop movement.
+              st.triggerStopMovement();
+            }
+          }
+        }
+        else
+        {
+          //if movement is disabled stopp any movement
+          st.triggerStopMovement();
+        }
+      }
 
       if (st.statusIsRunning())
       {
-          sys.driveToTeachedPosition(gnd.getTeachedPosition());
+        
+        if (gnd.movementIsEnabled())
+        {
+          sys.setOperationEnable(true);
 
-        if (sys.positionWasReached())
+          // check if position has changed
+          if ( gnd.newTeachedPosition() )
+          {
+            sys.calcNewTrajectory(gnd.getTeachedPosition(), gnd.isCollisionDetectionEnabled());
+          }
+
+          if (sys.isTrajectoryPointReached())
+          {
+            // pop the position out of list if position was reached
+            sys.setTrajectoryPoint();
+
+            // inform the state machine that the position was reached
+            st.triggerPositionReached();
+          }
+          else
+          {
+            sys.sendTargetTrajectoryPoint();
+          }
+        }
+        else
         {
           st.triggerStopMovement();
         }
@@ -138,30 +201,127 @@ int main(int argc, char** argv)
 
       if (st.statusIsStopped())
       {
-        sys.stopMovement();
+        if (gnd.movementIsEnabled())
+        {
+          // check if position has changed
+          if ( gnd.newTeachedPosition() )
+          {
+            sys.calcNewTrajectory(gnd.getTeachedPosition(), gnd.isCollisionDetectionEnabled());
+            
+            st.triggerStartMovement();
+          }
+          else
+          {
+            sys.setOperationEnable(false);
+          }
+          
+        }
+        else
+          // if movement is disabled set Operation disable
+          sys.setOperationEnable(false);
       }
     }
 
     if (st.currentModePosMode())
     {
+      // set the arm core mode to position mode
+      sys.setArmCoreMode(ROBOTARMCOREMODE_POSITION);
+
+      if (st.statusIsReadyToRun())
+      {
+        // is movement enabled
+        if (gnd.movementIsEnabled() )
+        {
+          // check if during the movemnt of the tractory the position has changed
+          // in this case the ik solver needs to calc the new position and discard
+          // the old trajectories
+          if ( gnd.newPosition() )
+          {
+            // calucalte new position
+            sys.calcNewTrajectory(gnd.getPosition(), gnd.isCollisionDetectionEnabled());
+          }
+          else
+          {
+            if ( sys.furtherTrajectoriePoints() )
+            {
+              // if end position not reached, change to state run and
+              // send the current position until reached
+              st.triggerNextPosition();
+            }
+            else
+            {
+              // if there is no new position and or the tracetrory list is empty
+              // change to state stop movement.
+              st.triggerStopMovement();
+            }
+          }
+        }
+        else
+        {
+          //if movement is disabled stopp any movement
+          st.triggerStopMovement();
+        }
+      }
+
       if (st.statusIsRunning())
       {
-        sys.driveToPosition(gnd.getPosition());
-
-        if (sys.positionWasReached())
+        if (gnd.movementIsEnabled())
         {
-          st.triggerPositionReached();
+
+          sys.setOperationEnable(true);
+
+          // check if position has changed
+          if ( gnd.newPosition() )
+          {
+            sys.calcNewTrajectory(gnd.getPosition(), gnd.isCollisionDetectionEnabled());
+          }
+
+          if (sys.isTrajectoryPointReached())
+          {
+            // pop the position out of list if position was reached
+            sys.setTrajectoryPoint();
+
+            // inform the state machine that the position was reached
+            st.triggerPositionReached();
+          }
+          else
+          {
+            sys.sendTargetTrajectoryPoint();
+          }
         }
+        else
+        {
+          st.triggerStopMovement();
+        }
+        
       }
 
       if (st.statusIsStopped())
       {
-        sys.stopMovement();
+        if (gnd.movementIsEnabled())
+        {
+          // check if position has changed
+          if ( gnd.newPosition() )
+          {
+            sys.calcNewTrajectory(gnd.getPosition(), gnd.isCollisionDetectionEnabled());
+            
+            st.triggerStartMovement();
+          }
+          else
+          {
+            sys.setOperationEnable(false);
+          }
+        }
+        else
+          // if movement is disabled stop any movement
+          sys.setOperationEnable(false);
       }
     }
 
     if (st.currentModeJoyMode())
     {
+      // set the arm core mode to position mode
+      sys.setArmCoreMode(ROBOTARMCOREMODE_VELOCITY);
 
       if (st.statusIsRunning())
       {

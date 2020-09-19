@@ -8,11 +8,13 @@
 class Groundstation
 {
 private:
-    globalData_enumTypeDef_robotArmMode m_currentMode;
+    int m_currentMode;
     globalData_enumTypeDef_robotArmAxis m_currentAxe;
     globalData_typeDef_robotArm_GS_ARM m_newData;
     globalData_typeDef_robotArm_GS_ARM m_oldData;
-    bool m_newDataFlag;
+    bool m_newPosition;
+    bool m_newTeachedPosition;
+    bool m_newJoyMovement;
     void receiveDataCallback(const frost_robot_arm::GroundstationToRobotarm::ConstPtr& msg);
     ros::NodeHandle* m_rosNode;
     ros::AsyncSpinner* m_spinner;
@@ -20,15 +22,20 @@ private:
 
 
 public:
-    bool movementWasStarted();
+    bool movementIsEnabled();
     bool modeWasChanged();
     bool newJoyMovement();
-    globalData_enumTypeDef_robotArmMode getCurrentMode();
+    bool isCollisionDetectionEnabled();
+    bool newPosition();
+    bool newTeachedPosition();
+    bool getEndEffectorState();
+    int getCurrentMode();
     globalData_enumTypeDef_robotArmAxis getAxe();
     int8_t getVelocitiy();
     globalData_enumTypeDef_robotArmTeachedPos getTeachedPosition();
     globalData_typeDef_robotArm_posTransformation getPosition();
     globalData_typeDef_robotArm_posTransformation getJoyMovement();
+    void initGroundstation();
     Groundstation(int argc, char** argv);
     ~Groundstation();
 };
