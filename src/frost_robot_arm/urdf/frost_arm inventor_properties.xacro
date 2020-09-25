@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<robot name="frost" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <material name="blue">
+    <color rgba="0 0 0.8 0.7"/>
+  </material>
+  <material name="red">
+    <color rgba="0.8 0 0 1"/>
+  </material>
+
+
+  <!-- mass is entered in kg data a referenced from mikes robot arm in inventor -->
+  <xacro:property name="link_base_mass" value="3.528" />
+  <xacro:property name="link_0_mass" value="3.107" />
+  <xacro:property name="link_1_mass" value="3.579" />
+  <xacro:property name="link_2_mass" value="1.800" />
+  <xacro:property name="link_3_mass" value="1.800" />
+  <xacro:property name="link_4_mass" value="1.041" />
+  <xacro:property name="link_5_mass" value="0.014" />
+
+  <link name="world" />
+
+  <!--xacro:unless value="${not connected_to}">
+    <joint name="${arm_id}_joint_${connected_to}" type="fixed">
+      <parent link="${connected_to}"/>
+      <child link="${arm_id}_link0"/>
+      <origin rpy="${rpy}" xyz="${xyz}"/>
+    </joint>
+  </xacro:unless-->
+
+  <joint name="world_joint" type="fixed">
+    <parent link= "world" />
+    <child link= "link_base" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <link name="link_base">
+    <visual>
+      <geometry>
+	      <box size="0.15 0.15 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.005"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	      <box size="0.15 0.15 0.01"/>
+      </geometry>
+      <material name="red"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0025"/>
+    </collision>
+    <inertial>
+    <!-- inventor gaves the inertia of a subassambly centerpoint in kg*mm²-->
+      <mass value="${link_base_mass}" />
+      <inertia ixx="12943.301"  ixy="920.962"   ixz="2494.072"
+                                iyy="34752.194" iyz="-1338.493"
+                                                izz="27487.656" />
+    </inertial>
+  </link>
+
+  <link name="link_0">
+    <visual>
+      <geometry>
+	      <box size="0.1 0.1 0.1"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.05"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	      <box size="0.1 0.1 0.1"/>
+      </geometry>
+      <material name="red"/>
+      <origin rpy="0 0 0" xyz="0 0 0.05"/>
+    </collision>
+    <inertial>
+    <!-- inventor gaves the inertia of a subassambly centerpoint in kg*mm²-->
+      <mass value="${link_0_mass}" />
+      <inertia ixx="4803.786"  ixy="-0.426"   ixz="260.203"
+                                iyy="9729.682" iyz="49.479"
+                                                izz="8748.941" />
+    </inertial>
+  </link>
+
+  <joint name="joint0" type="revolute">
+    <axis xyz="0 0 1"/>
+    <origin rpy="0 0 0" xyz="0 0 0.01"/>
+    <parent link="link_base"/>
+    <child link="link_0"/>
+    <!-- effort is for revolut joints in Nm for translatoric joints N
+    the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
+    <!-- this values for effort and velocity are entert without reference. This are only assumptipons-->
+    <limit effort="87" lower="-3.141592654" upper="3.141592654" velocity="20"/>
+  </joint>
+
+  <link name="link_1">
+    <visual>
+      <geometry>
+	      <box size="0.1 0.1 0.43"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.215"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+	      <box size="0.1 0.1 0.35"/>
+      </geometry>
+      <material name="red"/>
+      <origin rpy="0 0 0" xyz="0 0 0.215"/>
+    </collision>
+     <inertial>
+    <!-- inventor gaves the inertia of a subassambly centerpoint in kg*mm²-->
+      <mass value="${link_1_mass}" />
+      <inertia ixx="90838.481"  ixy="-333.149"  ixz="36.766"
+                                iyy="11131.504" iyz="-3760.304"
+                                                izz="85698.080" />
+    </inertial>
+  </link>
+
+
+  <joint name="joint1" type="revolute">
+    <axis xyz="0 1 0"/>
+    <parent link="link_0"/>
+    <child link="link_1"/>
+    <origin rpy="0 0 0" xyz="0 0 0.1"/>
+    <!-- effort is for revolut joints in Nm for translatoric joints N
+    the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
+    <!-- effort for the harmonic drive is given in Nm and velocity in rotation per minit-->
+    <!--effort specification for the HFUC-25-160-2UH: https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019644_HFUC_2UH.pdf -->
+    <!-- due to data sheet by a ratio of 160 and a Maximum input speed 7500 (oil lubrication) you can get up to 46.875 output rotation
+         so to be carfule we use the mean value between Maximum input speed 5600 (oil lubrication) and Maximum input speed (grease lubrication)
+         which is 40.9375 roundet to 41 rotation per minit maximum velocity-->
+    <limit effort="314" lower="-1.570796327" upper="1.570796327" velocity="41"/>
+  </joint>
+
+  <link name="link_2">
+    <visual>
+      <geometry>
+        <box size="0.08 0.08 0.21"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.08 0.08 0.21"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="red"/>
+    </collision>
+    <inertial>
+    <!-- inventor gaves the inertia of a subassambly centerpoint in kg*mm²-->
+      <mass value="${link_2_mass}" />
+      <inertia ixx="8246.445" ixy="1.389"     ixz="150.417"
+                              iyy="8368.767"  iyz="-25.482"
+                                              izz="2020.555" />
+    </inertial>
+  </link>
+
+  <joint name="joint2" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.43"/>
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <axis xyz="0 1 0"/>
+    <!-- effort is for revolut joints in Nm for translatoric joints N
+    the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
+    <!-- effort for the harmonic drive is given in Nm and velocity in rotation per minit-->
+    <!--effort specification for the CSG-17-120-2UH: https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019642_CSG_2UH.pdf -->
+    <!-- due to data sheet by a ratio is 120 and a Maximum input speed 10000 (oil lubrication) you can get up to 83.3333 output rotation
+         so to be carfule we use the mean value between Maximum input speed 7300 (oil lubrication) and Maximum input speed (grease lubrication)
+         which is 72.0832 roundet to 72 rotation per minit maximum velocity-->
+    <limit effort="143" lower="-2.268928027593" upper="2.617993877991" velocity="72"/>
+  </joint>
+
+  <link name="link_3">
+    <visual>
+      <geometry>
+        <box size="0.08 0.08 0.21"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.08 0.08 0.09"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <material name="red"/>
+    </collision>
+    <inertial>
+    <!-- inventor gaves the inertia of a subassambly centerpoint in kg*mm²-->
+      <mass value="${link_3_mass}" />
+      <inertia ixx="10012.296"  ixy="-30.262"   ixz="628.852"
+                                iyy="10358.351" iyz="38.680"
+                                                izz="2336.167" />
+    </inertial>
+  </link>
+
+
+  <joint name="joint3" type="revolute">
+    <origin rpy="0 0 0" xyz="0.0 0.0 0.21"/>
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <axis xyz="0 0 1"/>
+    <!-- effort is for revolut joints in Nm for translatoric joints N
+    the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
+    <!-- effort for the harmonic drive is given in Nm and velocity in rotation per minit-->
+    <!--effort specification for the CSF-14-100-2XH : https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019649_CSF_Mini.pdf -->
+    <!-- due to data sheet by a ratio is 100 and a Maximum input speed 8500 (oil lubrication) you can get up to 85 output rotation
+         so to be carfule we use the mean value between Maximum input speed 3500 (oil lubrication) and Maximum input speed (grease lubrication)
+         which is 60-->
+    <limit effort="54" lower="-2.705260340591" upper="2.705260340591" velocity="60"/>
+  </joint>
+
+
+  <link name="link_4">
+    <visual>
+      <geometry>
+        <box size="0.08 0.08 0.125"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0625"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.08 0.08 0.125"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0625"/>
+      <material name="red"/>
+    </collision>
+    <inertial>
+    <!-- inventor gaves the inertia of a subassambly centerpoint in kg*mm²-->
+      <mass value="${link_4_mass}" />
+      <inertia ixx="2740.748"  ixy="813.029"   ixz="37.382"
+                                iyy="3142.024" iyz="-16.318"
+                                                izz="4881.617" />
+    </inertial>
+  </link>
+
+
+  <joint name="joint4" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0.0 0.21"/>
+    <parent link="link_3"/>
+    <child link="link_4"/>
+    <axis xyz="0 1 0"/>
+    <!-- effort is for revolut joints in Nm for translatoric joints N
+    the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
+    <!-- effort for the harmonic drive is given in Nm and velocity in rotation per minit -->
+    <!--effort specification for the HFUC-14-100-2UH : https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019644_HFUC_2UH.pdf -->
+    <!-- due to data sheet by a ratio is 100 and a Maximum input speed 14000 (oil lubrication) you can get up to 140 output rotation
+         so to be carfule we use the mean value between Maximum input speed 8500 (oil lubrication) and Maximum input speed (grease lubrication)
+         which is 112.5 roundet to 113 rotation per minit maximum velocity-->
+    <limit effort="87" lower="-1.570796326795" upper="1.570796326795" velocity="113"/>
+  </joint>
+
+  <link name="link_5">
+    <visual>
+      <geometry>
+        <box size="0.08 0.08 0.001"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0006"/>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.08 0.08 0"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0006"/>
+      <material name="red"/>
+    </collision>
+    <inertial>
+    <!-- inventor gaves the inertia of a subassambly centerpoint in kg*mm²-->
+      <mass value="${link_5_mass}" />
+      <inertia ixx="3.174"  ixy="6.256" ixz="-0.000"
+                            iyy="6.256" iyz="0.000"
+                                        izz="3.174" />
+    </inertial>
+  </link>
+
+
+  <joint name="joint5" type="revolute">
+    <origin rpy="0 0 0" xyz="0 0 0.125"/>
+    <parent link="link_4"/>
+    <child link="link_5"/>
+    <axis xyz="0 0 1"/>
+    <!-- effort is for revolut joints in Nm for translatoric joints N
+    the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
+    <!-- this values for effort and velocity are entert without reference. This are only assumptipons-->
+    <limit effort="2" lower="-3.14159265359" upper="3.14159265359" velocity="10"/>
+  </joint>
+</robot>

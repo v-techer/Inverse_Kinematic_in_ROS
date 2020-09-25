@@ -19,14 +19,14 @@
     </inertial>
   </xacro:macro>
 
-
-  <xacro:property name="link_base_mass" value="0.500" />
-  <xacro:property name="link_0_mass" value="2.515" />
-  <xacro:property name="link_1_mass" value="5.214" />
-  <xacro:property name="link_2_mass" value="2.581" />
-  <xacro:property name="link_3_mass" value="2.581" />
-  <xacro:property name="link_4_mass" value="1.643" />
-  <xacro:property name="link_5_mass" value="0.200" />
+  <!-- mass is entered in kg -->
+  <xacro:property name="link_base_mass" value="3.528" />
+  <xacro:property name="link_0_mass" value="3.107" />
+  <xacro:property name="link_1_mass" value="3.579" />
+  <xacro:property name="link_2_mass" value="1.800" />
+  <xacro:property name="link_3_mass" value="1.800" />
+  <xacro:property name="link_4_mass" value="1.041" />
+  <xacro:property name="link_5_mass" value="0.014" />
 
   <link name="world" />
 
