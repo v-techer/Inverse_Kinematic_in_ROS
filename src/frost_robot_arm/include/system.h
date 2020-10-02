@@ -35,6 +35,7 @@ private:
     moveit::planning_interface::MoveGroupInterface* move_group;
     const robot_state::JointModelGroup* joint_model_group;
     moveit::planning_interface::MoveGroupInterface::Plan m_myPlan;
+    uint16_t m_trajectoryIterator;
     ros::NodeHandle* m_rosNode;
     ros::AsyncSpinner* m_spinner;
     ros::Subscriber sub;
@@ -48,16 +49,17 @@ public:
     void setArmCoreMode(globalData_enumTypeDef_robotArmCoreMode armCoreMode);
     void calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teachedPos, bool collisionDetection);
     void calcNewTrajectory(globalData_typeDef_robotArm_posTransformation transformationVector, bool collisionDetection);
+    void calcNewVelocity(globalData_typeDef_robotArm_posTransformation targetTransformation)
     void sendPositionToArmCore(void);
     void driveToTeachedPosition(globalData_enumTypeDef_robotArmTeachedPos value);
     void driveToPosition(globalData_typeDef_robotArm_posTransformation value);
-    void sendTargetTrajectoryPoint();
+    void incrementTrajectoryIterator();
     bool positionWasReached();
     bool isTrajectoryPointReached();
     bool furtherTrajectoriePoints();
-    void setTrajectoryPoint();
+    void setTargetTrajectoryPoint();
     void setTargetVelocitiy(uint8_t targetVelocity);
-    globalData_typeDef_robotArm_posTransformation calcNewPosition(globalData_typeDef_robotArm_posTransformation value);
+    globalData_typeDef_robotArm_posTransformation calcNewVelocity(globalData_typeDef_robotArm_posTransformation value);
     System(int argc, char** argv);
     ~System();
 };

@@ -13,6 +13,7 @@ find_package(catkin REQUIRED
   COMPONENTS
     message_generation
     std_msgs
+    tf
     interactive_markers
     moveit_core
     moveit_visual_tools
@@ -159,6 +160,7 @@ include_directories(include ${THIS_PACKAGE_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} 
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/frost_robot_arm_node.cpp)
 add_executable(test_debug src/test_debug.cpp)
+add_executable(state_publisher src/state_publisher.cpp)
 add_executable(frost_move_group_example src/frost_move_group_example.cpp src/system.cpp)
 add_executable(frost_move_group src/frost_move_group.cpp src/ground_station.cpp src/state_machine.cpp src/system.cpp)
 add_executable(panda_move_group src/panda_move_group.cpp)
@@ -180,6 +182,7 @@ add_executable(test_controller_robotarm src/test_controller_robotarm.cpp)
 #   ${catkin_LIBRARIES}
 # )
 
+target_link_libraries(state_publisher ${catkin_LIBRARIES})
 target_link_libraries(test_debug ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(frost_move_group_example ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(frost_move_group ${catkin_LIBRARIES} ${Boost_LIBRARIES})

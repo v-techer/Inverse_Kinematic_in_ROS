@@ -26,7 +26,6 @@
 #include <iostream>
 #include <array>
 
-
 static const std::string PLANNING_GROUP = "frost_arm";
 
 #define MAX_VELOCITY 10
@@ -167,7 +166,7 @@ bool System::positionWasReached()
     
 }
 
-globalData_typeDef_robotArm_posTransformation System::calcNewPosition(globalData_typeDef_robotArm_posTransformation value)
+globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_robotArm_posTransformation targetTransformation)
 {
 
 }
@@ -192,48 +191,44 @@ void System::setOperationEnable(bool operationState)
     m_transmitData.operationEnable = (uint8_t) operationState;
 }
 
-void System::sendTargetTrajectoryPoint()
+void System::setTargetTrajectoryPoint()
 {
-    //******************fill this function with life******************
-    bool nothing = true;
-}
+    trajectory_msgs::JointTrajectoryPoint trajectory_point;
 
-void System::setTargetVelocitiy(uint8_t targetVelocity)
-{
-    //*****************check if this numbers are legit*****************
-    // MAX_VELOCITY 
-    // m_transmitData.targetVelocities
-}
-
-void System::setTrajectoryPoint()
-{
-    // move_group->setStartState(move_group->getCurrentPose());
-    move_group->execute(m_myPlan);
-
-    int test = m_myPlan.trajectory_.joint_trajectory.points.size();
-
-    if (!m_myPlan.trajectory_.joint_trajectory.points.empty())
+    if (m_trajectoryIterator < m_myPlan.trajectory_.joint_trajectory.points.size())
     {
-        //double test = m_myPlan.trajectory_.joint_trajectory.points.at(1).velocities.at(1);
-        m_transmitData.targetPositions.JointAngle1 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions.at(0));
-        m_transmitData.targetPositions.JointAngle2 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions.at(1));
-        m_transmitData.targetPositions.JointAngle3 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions.at(2));
-        m_transmitData.targetPositions.JointAngle4 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions.at(3));
-        m_transmitData.targetPositions.JointAngle5 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions.at(4));
-        m_transmitData.targetPositions.JointAngle6 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions.at(5));
-        m_transmitData.targetVelocities.JointVelocity1 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(0));
-        m_transmitData.targetVelocities.JointVelocity2 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(1));
-        m_transmitData.targetVelocities.JointVelocity3 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(2));
-        m_transmitData.targetVelocities.JointVelocity4 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(3));
-        m_transmitData.targetVelocities.JointVelocity5 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(4));
-        m_transmitData.targetVelocities.JointVelocity6 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(5));
-        m_transmitData.targetAcceleration.JointAcceleration1 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).accelerations.at(0));
-        m_transmitData.targetAcceleration.JointAcceleration2 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).accelerations.at(1));
-        m_transmitData.targetAcceleration.JointAcceleration3 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).accelerations.at(2));
-        m_transmitData.targetAcceleration.JointAcceleration4 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).accelerations.at(3));
-        m_transmitData.targetAcceleration.JointAcceleration5 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).accelerations.at(4));
-        m_transmitData.targetAcceleration.JointAcceleration6 = 10000*rad2deg(m_myPlan.trajectory_.joint_trajectory.points.at(0).accelerations.at(5));
+        trajectory_point = m_myPlan.trajectory_.joint_trajectory.points.at(m_trajectoryIterator);
+
+        m_transmitData.targetPositions.JointAngle1 = 10000*rad2deg(trajectory_point.positions.at(0));
+        m_transmitData.targetPositions.JointAngle2 = 10000*rad2deg(trajectory_point.positions.at(1));
+        m_transmitData.targetPositions.JointAngle3 = 10000*rad2deg(trajectory_point.positions.at(2));
+        m_transmitData.targetPositions.JointAngle4 = 10000*rad2deg(trajectory_point.positions.at(3));
+        m_transmitData.targetPositions.JointAngle5 = 10000*rad2deg(trajectory_point.positions.at(4));
+        m_transmitData.targetPositions.JointAngle6 = 10000*rad2deg(trajectory_point.positions.at(5));
+        m_transmitData.targetVelocities.JointVelocity1 = 10000*rad2deg(trajectory_point.velocities.at(0));
+        m_transmitData.targetVelocities.JointVelocity2 = 10000*rad2deg(trajectory_point.velocities.at(1));
+        m_transmitData.targetVelocities.JointVelocity3 = 10000*rad2deg(trajectory_point.velocities.at(2));
+        m_transmitData.targetVelocities.JointVelocity4 = 10000*rad2deg(trajectory_point.velocities.at(3));
+        m_transmitData.targetVelocities.JointVelocity5 = 10000*rad2deg(trajectory_point.velocities.at(4));
+        m_transmitData.targetVelocities.JointVelocity6 = 10000*rad2deg(trajectory_point.velocities.at(5));
+        m_transmitData.targetAcceleration.JointAcceleration1 = 10000*rad2deg(trajectory_point.accelerations.at(0));
+        m_transmitData.targetAcceleration.JointAcceleration2 = 10000*rad2deg(trajectory_point.accelerations.at(1));
+        m_transmitData.targetAcceleration.JointAcceleration3 = 10000*rad2deg(trajectory_point.accelerations.at(2));
+        m_transmitData.targetAcceleration.JointAcceleration4 = 10000*rad2deg(trajectory_point.accelerations.at(3));
+        m_transmitData.targetAcceleration.JointAcceleration5 = 10000*rad2deg(trajectory_point.accelerations.at(4));
+        m_transmitData.targetAcceleration.JointAcceleration6 = 10000*rad2deg(trajectory_point.accelerations.at(5));
     }
+}
+
+void System::setTargetVelocitiy(globalData_typeDef_robotArmVelocity targetVelocity)
+{
+    m_transmitData.targetVelocities = targetVelocity;
+}
+
+
+void System::incrementTrajectoryIterator()
+{
+    m_trajectoryIterator++;
 }
 
 void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teachedPos, bool collisionDetection)
@@ -255,6 +250,7 @@ void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teached
         // Now, we call the planner to compute the plan and visualize it.
         // Note that we are just planning, not asking move_group
         // to actually move the robot.
+
         errorCode = move_group->plan(m_myPlan);
 
         success = (errorCode == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -263,6 +259,10 @@ void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teached
         if (success)
         {
             ROS_INFO("position planning successfuly!");
+
+            move_group->setJointValueTarget(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions);
+
+            m_trajectoryIterator = 0;
         }
         // TODO add a return value with info about calculation. For example moveitErrorCode
     }
@@ -313,6 +313,7 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     if (success)
     {
         ROS_INFO("position planning successfuly!");
+        
     }
     // TODO add a return value with info about calculation. For example moveitErrorCode
 }    
@@ -320,7 +321,8 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
 
 bool System::furtherTrajectoriePoints()
 {
-    return !(m_myPlan.trajectory_.joint_trajectory.points.empty());
+    if (m_trajectoryIterator < m_myPlan.trajectory_.joint_trajectory.points.size())
+        return true;
 }
 
 
@@ -388,11 +390,12 @@ void System::receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPt
     m_newReceivedData.dummy[0] = msg->dummy[0];
     m_newReceivedData.dummy[1] = msg->dummy[1];
 
-
+    // check if positionReached got deprecated
     if (m_newReceivedData.PositionReached[0] && m_newReceivedData.PositionReached[1] && m_newReceivedData.PositionReached[2] &&
         m_newReceivedData.PositionReached[3] && m_newReceivedData.PositionReached[4] && m_newReceivedData.PositionReached[5])
     {
-        m_trajectoryPointReached = true;
+        if (!std::equal(std::begin(m_newReceivedData.PositionReached), std::end(m_newReceivedData.PositionReached), std::begin(m_oldReceivedData.PositionReached)))
+            m_trajectoryPointReached = true;
     }
 }
 

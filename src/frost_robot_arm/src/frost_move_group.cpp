@@ -183,14 +183,14 @@ int main(int argc, char** argv)
           if (sys.isTrajectoryPointReached())
           {
             // pop the position out of list if position was reached
-            sys.setTrajectoryPoint();
+            sys.incrementTrajectoryIterator();
 
             // inform the state machine that the position was reached
             st.triggerPositionReached();
           }
           else
           {
-            sys.sendTargetTrajectoryPoint();
+            sys.setTargetTrajectoryPoint();
           }
         }
         else
@@ -201,20 +201,14 @@ int main(int argc, char** argv)
 
       if (st.statusIsStopped())
       {
+        if ( gnd.newTeachedPosition() )
+        {
+          sys.calcNewTrajectory(gnd.getTeachedPosition(), gnd.isCollisionDetectionEnabled());  
+        }
+
         if (gnd.movementIsEnabled())
         {
-          // check if position has changed
-          if ( gnd.newTeachedPosition() )
-          {
-            sys.calcNewTrajectory(gnd.getTeachedPosition(), gnd.isCollisionDetectionEnabled());
-            
-            st.triggerStartMovement();
-          }
-          else
-          {
-            sys.setOperationEnable(false);
-          }
-          
+          st.triggerStartMovement();      
         }
         else
           // if movement is disabled set Operation disable
@@ -279,14 +273,14 @@ int main(int argc, char** argv)
           if (sys.isTrajectoryPointReached())
           {
             // pop the position out of list if position was reached
-            sys.setTrajectoryPoint();
+            sys.incrementTrajectoryIterator();
 
             // inform the state machine that the position was reached
             st.triggerPositionReached();
           }
           else
           {
-            sys.sendTargetTrajectoryPoint();
+            sys.setTargetTrajectoryPoint();
           }
         }
         else
@@ -298,23 +292,21 @@ int main(int argc, char** argv)
 
       if (st.statusIsStopped())
       {
+        if ( gnd.newPosition() )
+        {
+          sys.calcNewTrajectory(gnd.getPosition(), gnd.isCollisionDetectionEnabled()); 
+        }
+
         if (gnd.movementIsEnabled())
         {
           // check if position has changed
-          if ( gnd.newPosition() )
-          {
-            sys.calcNewTrajectory(gnd.getPosition(), gnd.isCollisionDetectionEnabled());
-            
             st.triggerStartMovement();
-          }
-          else
-          {
-            sys.setOperationEnable(false);
-          }
         }
         else
+        {
           // if movement is disabled stop any movement
           sys.setOperationEnable(false);
+        }
       }
     }
 
