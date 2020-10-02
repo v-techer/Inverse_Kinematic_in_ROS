@@ -86,9 +86,9 @@
         return m_currentAxe;
     }
 
-    int8_t Groundstation::getVelocitiy()
+    int16_t Groundstation::getVelocitiyPercentig()
     {
-        return m_newData.axisVelocity;
+        return m_newData.axisVelocityPercentig;
     }
 
     globalData_enumTypeDef_robotArmTeachedPos Groundstation::getTeachedPosition()
@@ -135,7 +135,7 @@
         m_newData.dummy2 = msg->dummy2;
         m_newData.teachedPos = static_cast<globalData_enumTypeDef_robotArmTeachedPos>(msg->teached_pos);
         m_newData.activAxis = static_cast<globalData_enumTypeDef_robotArmAxis>(msg->active_axis);
-        m_newData.axisVelocity = msg->axis_velocity;
+        m_newData.axisVelocityPercentig = msg->axis_velocity;
         m_newData.targetCoordinate.target_x = msg->target_x;
         m_newData.targetCoordinate.target_y = msg->target_y;
         m_newData.targetCoordinate.target_z = msg->target_z;

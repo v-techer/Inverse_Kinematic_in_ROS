@@ -22,10 +22,10 @@
 class System
 {
 private:
-    void sendDataToArmCore(globalData_typeDef_robotArm_ARM_MOTOR TargetValues);
     void receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPtr& msg);
     double rad2deg(double rad);
     double deg2rad(int16_t degree);
+    int32_t calcVelocity(int16_t velocityPercentig);
 
     globalData_typeDef_robotArm_MOTOR_ARM m_newReceivedData;
     globalData_typeDef_robotArm_MOTOR_ARM m_oldReceivedData;
@@ -41,25 +41,22 @@ private:
     ros::Subscriber sub;
 
 public:
-    void moveAxe(globalData_enumTypeDef_robotArmAxis axe, int8_t velocity);
-    void stopMovement();
+    void sendDataToArmCore(globalData_typeDef_robotArm_ARM_MOTOR TargetValues);
+    globalData_typeDef_robotArmVelocity setAxeVelocity(globalData_enumTypeDef_robotArmAxis axeIndex, int16_t velocityPercentig);
+    void enableMovement();
+    void disableMovement();
     void init();
     void setEndeffectorClosed(bool state);
-    void setOperationEnable(bool operationState);
     void setArmCoreMode(globalData_enumTypeDef_robotArmCoreMode armCoreMode);
     void calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teachedPos, bool collisionDetection);
     void calcNewTrajectory(globalData_typeDef_robotArm_posTransformation transformationVector, bool collisionDetection);
-    void calcNewVelocity(globalData_typeDef_robotArm_posTransformation targetTransformation)
-    void sendPositionToArmCore(void);
+    globalData_typeDef_robotArmVelocity calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector);
     void driveToTeachedPosition(globalData_enumTypeDef_robotArmTeachedPos value);
-    void driveToPosition(globalData_typeDef_robotArm_posTransformation value);
     void incrementTrajectoryIterator();
-    bool positionWasReached();
     bool isTrajectoryPointReached();
     bool furtherTrajectoriePoints();
     void setTargetTrajectoryPoint();
-    void setTargetVelocitiy(uint8_t targetVelocity);
-    globalData_typeDef_robotArm_posTransformation calcNewVelocity(globalData_typeDef_robotArm_posTransformation value);
+    void setTargetVelocitiy(globalData_typeDef_robotArmVelocity targetVelocity);
     System(int argc, char** argv);
     ~System();
 };

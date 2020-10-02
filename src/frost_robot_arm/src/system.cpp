@@ -66,39 +66,41 @@ void System::init()
         move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 }
 
-void System::moveAxe(globalData_enumTypeDef_robotArmAxis axe, int8_t velocity)
+globalData_typeDef_robotArmVelocity System::setAxeVelocity(globalData_enumTypeDef_robotArmAxis axeIndex, int16_t velocityPercentig)
 {
+    int32_t tempAxes[ROBOTARMAXIS_MAX_LOCAL_AXIS];
+    globalData_typeDef_robotArmVelocity targetVelocity;
 
+    for (uint8_t i = 0; i < ROBOTARMAXIS_MAX_LOCAL_AXIS; i++)
+    {
+        tempAxes[i] = 0;
+        if ( i == axeIndex )
+            tempAxes[i] = calcVelocity(velocityPercentig);
+    }
+
+    targetVelocity.JointVelocity1 = tempAxes[0];
+    targetVelocity.JointVelocity2 = tempAxes[1];
+    targetVelocity.JointVelocity3 = tempAxes[2];
+    targetVelocity.JointVelocity4 = tempAxes[3];
+    targetVelocity.JointVelocity5 = tempAxes[4];
+    targetVelocity.JointVelocity6 = tempAxes[5];
+
+    return targetVelocity;
 }
 
-void System::stopMovement()
+int32_t System::calcVelocity(int16_t velocityPercentig)
 {
-    // ros::Publisher joint_pub = m_rosNode->advertise<sensor_msgs::JointState>("joint_states", 1);
-    // std_msgs::Header head;
-    // sensor_msgs::JointState jointState;
+    return (int32_t) (MAX_VELOCITY * (velocityPercentig/100));
+}
 
-    // jointState.header.stamp = ros::Time::now();
-    // jointState.name.resize(8);
-    // jointState.position.resize(8);
-    // jointState.name[0] = "joint0";
-    // jointState.name[1] = "joint1";
-    // jointState.name[2] = "joint2";
-    // jointState.name[3] = "joint3";
-    // jointState.name[4] = "joint4";
-    // jointState.name[5] = "joint5";
-    // jointState.name[6] = "left_gripper_joint";
-    // jointState.name[7] = "right_gripper_joint";
+void System::disableMovement()
+{
+    m_transmitData.operationEnable = false;
+}
 
-    // jointState.position[0] = 0;
-    // jointState.position[1] = -0.8938;
-    // jointState.position[2] = -1.7289;
-    // jointState.position[3] = -1.9579;
-    // jointState.position[4] = -1.3451;
-    // jointState.position[5] = 0.9199;
-    // jointState.position[6] = 0.0;
-    // jointState.position[7] = 0.0;
-
-    // joint_pub.publish(jointState);
+void System::enableMovement()
+{
+    m_transmitData.operationEnable = true;
 }
 
 void System::driveToTeachedPosition(globalData_enumTypeDef_robotArmTeachedPos value)
@@ -156,20 +158,6 @@ void System::driveToTeachedPosition(globalData_enumTypeDef_robotArmTeachedPos va
     
 }
 
-void System::driveToPosition(globalData_typeDef_robotArm_posTransformation value)
-{
-    
-}
-
-bool System::positionWasReached()
-{
-    
-}
-
-globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_robotArm_posTransformation targetTransformation)
-{
-
-}
 
 void System::sendDataToArmCore(globalData_typeDef_robotArm_ARM_MOTOR TargetValues)
 {
@@ -184,11 +172,6 @@ void System::setArmCoreMode(globalData_enumTypeDef_robotArmCoreMode armCoreMode)
 void System::setEndeffectorClosed(bool state)
 {
     m_transmitData.Endeffector_open = (uint8_t) state;
-}
-
-void System::setOperationEnable(bool operationState)
-{
-    m_transmitData.operationEnable = (uint8_t) operationState;
 }
 
 void System::setTargetTrajectoryPoint()
@@ -231,50 +214,57 @@ void System::incrementTrajectoryIterator()
     m_trajectoryIterator++;
 }
 
-void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teachedPos, bool collisionDetection)
+globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector)
 {
-    bool success = false;
+    bool success;
+    
+    geometry_msgs::PoseStamped target;
 
+    tf2::Quaternion rotation;
+    tf2::Quaternion orientation;
+    tf2::Quaternion newOrientation;
     moveit::planning_interface::MoveItErrorCode errorCode;
 
-    globalData_typeDef_robotArm_ARM_MOTOR targetValue;
+    success = false;
 
-    // get all registerd position for robot arm as list of names
-    ros::V_string listOfTargetPositionNames = move_group->getNamedTargets();
+    // get the current positon. The position is neccessery. It seems it conntains important
+    // inforamtion for further excuting of positions.
+    target = move_group->getCurrentPose();
 
-    //check if position is in range.
-    if ( teachedPos < listOfTargetPositionNames.size())
+    // take care and use the setEulerZYX. This calcualates the absoulte positin of the endeffector.
+    // with the setRPY it always cals arelative movement!
+    orientation.setRPY( deg2rad(transformationVector.target_roll), deg2rad(transformationVector.target_pitch), deg2rad(transformationVector.target_yaw) );
+
+    orientation.normalize();
+
+    target.pose.orientation.x = orientation.getX();
+    target.pose.orientation.y = orientation.getY();
+    target.pose.orientation.z = orientation.getZ();
+    target.pose.orientation.w = orientation.getW();
+
+    target.pose.position.x = ((double) transformationVector.target_x/1000);
+    target.pose.position.y = ((double) transformationVector.target_y/1000);
+    target.pose.position.z = ((double) transformationVector.target_z/1000);
+
+    move_group->setPoseTarget(target);
+    
+    errorCode = move_group->plan(m_myPlan);
+
+    success = (errorCode == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+    
+    // if calcualtion was successfuly save the new trajectory in in m_myPlan 
+    if (success)
     {
-        move_group->setNamedTarget(move_group->getNamedTargets()[teachedPos]);
-
-        // Now, we call the planner to compute the plan and visualize it.
-        // Note that we are just planning, not asking move_group
-        // to actually move the robot.
-
-        errorCode = move_group->plan(m_myPlan);
-
-        success = (errorCode == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        ROS_INFO("position planning successfuly!");
         
-        // if calcualtion was successfuly save the new trajectory in in m_myPlan 
-        if (success)
-        {
-            ROS_INFO("position planning successfuly!");
-
-            move_group->setJointValueTarget(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions);
-
-            m_trajectoryIterator = 0;
-        }
-        // TODO add a return value with info about calculation. For example moveitErrorCode
     }
-    else
-    {
-        ROS_INFO("position is out of range!");
-    }
+    // TODO add a return value with info about calculation. For example moveitErrorCode
 }
 
 void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation transformationVector, bool collisionDetection)
 {
     bool success;
+
     geometry_msgs::PoseStamped target;
 
     tf2::Quaternion rotation;
@@ -317,6 +307,47 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     }
     // TODO add a return value with info about calculation. For example moveitErrorCode
 }    
+
+void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teachedPos, bool collisionDetection)
+{
+    bool success = false;
+
+    moveit::planning_interface::MoveItErrorCode errorCode;
+
+    globalData_typeDef_robotArm_ARM_MOTOR targetValue;
+
+    // get all registerd position for robot arm as list of names
+    ros::V_string listOfTargetPositionNames = move_group->getNamedTargets();
+
+    //check if position is in range.
+    if ( teachedPos < listOfTargetPositionNames.size())
+    {
+        move_group->setNamedTarget(move_group->getNamedTargets()[teachedPos]);
+
+        // Now, we call the planner to compute the plan and visualize it.
+        // Note that we are just planning, not asking move_group
+        // to actually move the robot.
+
+        errorCode = move_group->plan(m_myPlan);
+
+        success = (errorCode == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        
+        // if calcualtion was successfuly save the new trajectory in in m_myPlan 
+        if (success)
+        {
+            ROS_INFO("position planning successfuly!");
+
+            move_group->setJointValueTarget(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions);
+
+            m_trajectoryIterator = 0;
+        }
+        // TODO add a return value with info about calculation. For example moveitErrorCode
+    }
+    else
+    {
+        ROS_INFO("position is out of range!");
+    }
+}
 
 
 bool System::furtherTrajectoriePoints()

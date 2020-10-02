@@ -31,7 +31,7 @@ public:
     bool getEndEffectorState();
     int getCurrentMode();
     globalData_enumTypeDef_robotArmAxis getAxe();
-    int8_t getVelocitiy();
+    int16_t getVelocitiyPercentig();
     globalData_enumTypeDef_robotArmTeachedPos getTeachedPosition();
     globalData_typeDef_robotArm_posTransformation getPosition();
     globalData_typeDef_robotArm_posTransformation getJoyMovement();

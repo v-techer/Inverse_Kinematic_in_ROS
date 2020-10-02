@@ -368,7 +368,7 @@ typedef struct /*CHANGE SE 08.07.2019 */
 	globalData_enumTypeDef_robotArmMode mode;				// see enum typedef
 	globalData_enumTypeDef_robotArmTeachedPos teachedPos;  // see enum typedef
 	globalData_enumTypeDef_robotArmAxis activAxis;			// see enum typedef
-	int16_t axisVelocity;
+	int16_t axisVelocityPercentig;
 	globalData_typeDef_robotArm_posTransformation targetCoordinate;
 	globalData_enumTypeDef_robotArmgripperStatus endEffectorState;
 	uint8_t movementStarted;

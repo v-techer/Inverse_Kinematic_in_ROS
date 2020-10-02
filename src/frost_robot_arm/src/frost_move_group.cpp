@@ -106,9 +106,9 @@ int main(int argc, char** argv)
         if (gnd.movementIsEnabled())
         {
           // enabele operation
-          sys.setOperationEnable(true);
+          sys.enableMovement();
 
-          sys.setTargetVelocitiy(gnd.getVelocitiy());
+          sys.setTargetVelocitiy(sys.setAxeVelocity(gnd.getAxe(), gnd.getVelocitiyPercentig()));
         }
         else
           st.triggerStopMovement();
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
          st.triggerStartMovement();
         
         else
-          sys.setOperationEnable(false);
+          sys.disableMovement();
       }
     }
 
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
         
         if (gnd.movementIsEnabled())
         {
-          sys.setOperationEnable(true);
+          sys.enableMovement();
 
           // check if position has changed
           if ( gnd.newTeachedPosition() )
@@ -212,7 +212,7 @@ int main(int argc, char** argv)
         }
         else
           // if movement is disabled set Operation disable
-          sys.setOperationEnable(false);
+          sys.disableMovement();
       }
     }
 
@@ -236,6 +236,7 @@ int main(int argc, char** argv)
           }
           else
           {
+            // check if all trajectory poits are reached
             if ( sys.furtherTrajectoriePoints() )
             {
               // if end position not reached, change to state run and
@@ -262,7 +263,7 @@ int main(int argc, char** argv)
         if (gnd.movementIsEnabled())
         {
 
-          sys.setOperationEnable(true);
+          sys.enableMovement();
 
           // check if position has changed
           if ( gnd.newPosition() )
@@ -305,7 +306,7 @@ int main(int argc, char** argv)
         else
         {
           // if movement is disabled stop any movement
-          sys.setOperationEnable(false);
+          sys.disableMovement();
         }
       }
     }
@@ -317,32 +318,49 @@ int main(int argc, char** argv)
 
       if (st.statusIsRunning())
       {
-        if (gnd.newJoyMovement())
+        if (gnd.movementIsEnabled())
         {
-          sys.driveToPosition(sys.calcNewPosition(gnd.getJoyMovement()));
+          sys.enableMovement();
 
-          st.triggerNextPosition();
+          sys.setTargetVelocitiy(sys.calcNewVelocity(gnd.getJoyMovement()));
+
+          if(gnd.newJoyMovement())
+          {
+            st.triggerNextPosition();
+          }
         }
-
-        if(sys.positionWasReached())
+        else
         {
-          st.triggerPositionReached();
+          st.triggerStopMovement();
         }
+        
       }
 
       if (st.statusIsReadyToRun())
       {
-        if (gnd.newJoyMovement())
+        if (gnd.movementIsEnabled())
         {
-          sys.driveToPosition(sys.calcNewPosition(gnd.getJoyMovement()));
-
-          st.triggerNextPosition();
+          if (gnd.newJoyMovement())
+          {
+            st.triggerNextPosition();
+          }
+        }
+        else
+        {
+          st.triggerStopMovement();
         }
       }
 
       if (st.statusIsStopped())
       {
-        sys.stopMovement();
+        if (gnd.movementIsEnabled())
+        {
+          st.triggerStartMovement();
+        }
+        else
+        {
+          sys.disableMovement();
+        }
       }
     }
   }
