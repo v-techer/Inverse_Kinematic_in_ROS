@@ -5,7 +5,7 @@ GROUNDSTATION = {"ip":"192.168.0.21", "port":2020}
 IO_CORE = {"ip":'192.168.0.22', "port":1024}
 ARM_CORE = {"ip":'192.168.0.25', "port":2020}
 HOST = {"ip":'192.168.0.50', "port":2020}
-ROS_NODE_NAME = 'data_pipeline'
+ROS_NODE_NAME = 'central_communication_node'
 
 ID_ERROR = 0
 ID_BMS = 2

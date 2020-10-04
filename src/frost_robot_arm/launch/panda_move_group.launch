@@ -1,6 +1,0 @@
-<launch>
-
-  <node name="panda_move_group" pkg="frost_robot_arm" type="panda_move_group" respawn="false" output="screen">
-  </node>
-
-</launch>

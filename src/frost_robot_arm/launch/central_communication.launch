@@ -1,0 +1,11 @@
+<launch>
+
+  <arg name="real_arm" default="false" />
+
+  <node name="central_communication_node" pkg="horizon_ethernet_interface" type="ethernet_Robotarm.py">
+  </node>
+
+<!-- if the real arm is not connected dont publish encoder values-->
+  <node name="state_publisher" pkg="frost_robot_arm" type="state_publisher" if="$(eval real_arm == false)"> </node>
+
+</launch>

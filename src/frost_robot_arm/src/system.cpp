@@ -16,19 +16,17 @@
 #include "geometry_msgs/PoseStamped.h"
 #include <tf2/LinearMath/Quaternion.h>
 
-#include "system.h"
-#include "globalDataStructures.h"
-#include <stdint.h>
-
 #include "frost_robot_arm/ArmCoreToSystem.h"
 #include "frost_robot_arm/SystemToArmCore.h"
+#include "globalDataStructures.h"
+#include "system.h"
 
-#include <iostream>
-#include <array>
+// data to the robot arm core are transmittet as degres with a persition of 3 number of digits after the decimal point.
+// further more are the numbers represented in rotation per minits.
 
 static const std::string PLANNING_GROUP = "frost_arm";
 
-#define MAX_VELOCITY 10
+#define MAX_VELOCITY 10.0000
 const double pi = 3.141592654;
 
 
@@ -42,8 +40,13 @@ m_positionReached(false)
 
     m_spinner = new ros::AsyncSpinner(1);
     
+    // initate receiver callback function
     sub = m_rosNode->subscribe("arm_core_to_ik_solver", 1000, &System::receiveDataCallback, this);
+    
+    // initate ros transmitter function
+    pub = m_rosNode->advertise<frost_robot_arm::SystemToArmCore>("ik_solver_to_arm_core", 1);
 
+    // start ros node
     m_spinner->start();
 
     ROS_INFO("I am alive!");
@@ -66,6 +69,31 @@ void System::init()
         move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 }
 
+/***************************** getter functions *******************************
+ */
+bool System::isTrajectoryPointReached()
+{
+    bool rc = m_trajectoryPointReached;
+    m_trajectoryPointReached = false;
+    return rc;
+}
+
+/*************************** end getter functions *****************************
+ */
+
+
+/***************************** setter functions *******************************
+ */
+void System::disableMovement()
+{
+    m_transmitData.operationEnable = false;
+}
+
+void System::enableMovement()
+{
+    m_transmitData.operationEnable = true;
+}
+
 globalData_typeDef_robotArmVelocity System::setAxeVelocity(globalData_enumTypeDef_robotArmAxis axeIndex, int16_t velocityPercentig)
 {
     int32_t tempAxes[ROBOTARMAXIS_MAX_LOCAL_AXIS];
@@ -75,7 +103,7 @@ globalData_typeDef_robotArmVelocity System::setAxeVelocity(globalData_enumTypeDe
     {
         tempAxes[i] = 0;
         if ( i == axeIndex )
-            tempAxes[i] = calcVelocity(velocityPercentig);
+            tempAxes[i] = rad2deg(calcVelocity(velocityPercentig)) * 1000;
     }
 
     targetVelocity.JointVelocity1 = tempAxes[0];
@@ -88,82 +116,6 @@ globalData_typeDef_robotArmVelocity System::setAxeVelocity(globalData_enumTypeDe
     return targetVelocity;
 }
 
-int32_t System::calcVelocity(int16_t velocityPercentig)
-{
-    return (int32_t) (MAX_VELOCITY * (velocityPercentig/100));
-}
-
-void System::disableMovement()
-{
-    m_transmitData.operationEnable = false;
-}
-
-void System::enableMovement()
-{
-    m_transmitData.operationEnable = true;
-}
-
-void System::driveToTeachedPosition(globalData_enumTypeDef_robotArmTeachedPos value)
-{
-    bool success = false;
-    globalData_typeDef_robotArm_ARM_MOTOR targetValue;
-
-    // get all registerd position for robot arm as list of names
-    ros::V_string listOfTargetPositionNames = move_group->getNamedTargets();
-    int bla = listOfTargetPositionNames.size();
-    //check if position is in range.
-    if ( value < listOfTargetPositionNames.size())
-    {
-        move_group->setNamedTarget(move_group->getNamedTargets()[value]);
-
-        // Now, we call the planner to compute the plan and visualize it.
-        // Note that we are just planning, not asking move_group
-        // to actually move the robot.
-        success = (move_group->plan(m_myPlan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-
-        if (success)
-        {
-            for (int i = 0; i < m_myPlan.trajectory_.joint_trajectory.points.size(); i++)
-            {
-
-                //wait for position reached
-                //while(!m_positionReached);
-
-                // targetValue.dataID = GLOBALDATA_ID_ARM;
-                // targetValue.Endeffector_open = false;
-                // targetValue.operationEnable = true;
-
-                // targetValue.targetArmCoreMode = ROBOTARMMODE_POSITION;
-                // trajectory_msgs::JointTrajectoryPoint temTrajecotryPoints = my_plan.trajectory_.joint_trajectory.points.at(i);
-                
-                // for (int j = 0; j < temTrajecotryPoints.positions.size(); j++)
-                // {
-                //     // TODO convert rad to deg and save value in int32
-                //     targetValue.targetPositions = dynamic_cast<int> (rad2deg(temTrajecotryPoints.positions.at(i)) * 10000);
-
-                //     targetValue.targetVelocities = dynamic_cast<int> (rad2deg(temTrajecotryPoints.velocities.at(i)) * 10000);
-
-                //     targetValue.targetAcceleration = dynamic_cast<int> (rad2deg(temTrajecotryPoints.accelerations.at(i)) * 10000);
-                // }
-                // sendDataToArmCore(targetValue);
-            }
-            move_group->execute(m_myPlan.trajectory_);
-            move_group->move();
-        }
-    }
-    else
-    {
-        ROS_INFO("position is out of range!");
-    }
-    
-}
-
-
-void System::sendDataToArmCore(globalData_typeDef_robotArm_ARM_MOTOR TargetValues)
-{
-
-}
-
 void System::setArmCoreMode(globalData_enumTypeDef_robotArmCoreMode armCoreMode)
 {
     m_transmitData.targetArmCoreMode = armCoreMode;
@@ -174,6 +126,11 @@ void System::setEndeffectorClosed(bool state)
     m_transmitData.Endeffector_open = (uint8_t) state;
 }
 
+void System::setTargetVelocitiy(globalData_typeDef_robotArmVelocity targetVelocity)
+{
+    m_transmitData.targetVelocities = targetVelocity;
+}
+
 void System::setTargetTrajectoryPoint()
 {
     trajectory_msgs::JointTrajectoryPoint trajectory_point;
@@ -182,36 +139,41 @@ void System::setTargetTrajectoryPoint()
     {
         trajectory_point = m_myPlan.trajectory_.joint_trajectory.points.at(m_trajectoryIterator);
 
-        m_transmitData.targetPositions.JointAngle1 = 10000*rad2deg(trajectory_point.positions.at(0));
-        m_transmitData.targetPositions.JointAngle2 = 10000*rad2deg(trajectory_point.positions.at(1));
-        m_transmitData.targetPositions.JointAngle3 = 10000*rad2deg(trajectory_point.positions.at(2));
-        m_transmitData.targetPositions.JointAngle4 = 10000*rad2deg(trajectory_point.positions.at(3));
-        m_transmitData.targetPositions.JointAngle5 = 10000*rad2deg(trajectory_point.positions.at(4));
-        m_transmitData.targetPositions.JointAngle6 = 10000*rad2deg(trajectory_point.positions.at(5));
-        m_transmitData.targetVelocities.JointVelocity1 = 10000*rad2deg(trajectory_point.velocities.at(0));
-        m_transmitData.targetVelocities.JointVelocity2 = 10000*rad2deg(trajectory_point.velocities.at(1));
-        m_transmitData.targetVelocities.JointVelocity3 = 10000*rad2deg(trajectory_point.velocities.at(2));
-        m_transmitData.targetVelocities.JointVelocity4 = 10000*rad2deg(trajectory_point.velocities.at(3));
-        m_transmitData.targetVelocities.JointVelocity5 = 10000*rad2deg(trajectory_point.velocities.at(4));
-        m_transmitData.targetVelocities.JointVelocity6 = 10000*rad2deg(trajectory_point.velocities.at(5));
-        m_transmitData.targetAcceleration.JointAcceleration1 = 10000*rad2deg(trajectory_point.accelerations.at(0));
-        m_transmitData.targetAcceleration.JointAcceleration2 = 10000*rad2deg(trajectory_point.accelerations.at(1));
-        m_transmitData.targetAcceleration.JointAcceleration3 = 10000*rad2deg(trajectory_point.accelerations.at(2));
-        m_transmitData.targetAcceleration.JointAcceleration4 = 10000*rad2deg(trajectory_point.accelerations.at(3));
-        m_transmitData.targetAcceleration.JointAcceleration5 = 10000*rad2deg(trajectory_point.accelerations.at(4));
-        m_transmitData.targetAcceleration.JointAcceleration6 = 10000*rad2deg(trajectory_point.accelerations.at(5));
+        m_transmitData.targetPositions.JointAngle1 = 1000*rad2deg(trajectory_point.positions.at(0));
+        m_transmitData.targetPositions.JointAngle2 = 1000*rad2deg(trajectory_point.positions.at(1));
+        m_transmitData.targetPositions.JointAngle3 = 1000*rad2deg(trajectory_point.positions.at(2));
+        m_transmitData.targetPositions.JointAngle4 = 1000*rad2deg(trajectory_point.positions.at(3));
+        m_transmitData.targetPositions.JointAngle5 = 1000*rad2deg(trajectory_point.positions.at(4));
+        m_transmitData.targetPositions.JointAngle6 = 1000*rad2deg(trajectory_point.positions.at(5));
+        m_transmitData.targetVelocities.JointVelocity1 = 1000*rad2deg(trajectory_point.velocities.at(0));
+        m_transmitData.targetVelocities.JointVelocity2 = 1000*rad2deg(trajectory_point.velocities.at(1));
+        m_transmitData.targetVelocities.JointVelocity3 = 1000*rad2deg(trajectory_point.velocities.at(2));
+        m_transmitData.targetVelocities.JointVelocity4 = 1000*rad2deg(trajectory_point.velocities.at(3));
+        m_transmitData.targetVelocities.JointVelocity5 = 1000*rad2deg(trajectory_point.velocities.at(4));
+        m_transmitData.targetVelocities.JointVelocity6 = 1000*rad2deg(trajectory_point.velocities.at(5));
+        m_transmitData.targetAcceleration.JointAcceleration1 = 1000*rad2deg(trajectory_point.accelerations.at(0));
+        m_transmitData.targetAcceleration.JointAcceleration2 = 1000*rad2deg(trajectory_point.accelerations.at(1));
+        m_transmitData.targetAcceleration.JointAcceleration3 = 1000*rad2deg(trajectory_point.accelerations.at(2));
+        m_transmitData.targetAcceleration.JointAcceleration4 = 1000*rad2deg(trajectory_point.accelerations.at(3));
+        m_transmitData.targetAcceleration.JointAcceleration5 = 1000*rad2deg(trajectory_point.accelerations.at(4));
+        m_transmitData.targetAcceleration.JointAcceleration6 = 1000*rad2deg(trajectory_point.accelerations.at(5));
     }
 }
 
-void System::setTargetVelocitiy(globalData_typeDef_robotArmVelocity targetVelocity)
-{
-    m_transmitData.targetVelocities = targetVelocity;
-}
+/*************************** end setter functions *****************************
+ */
 
-
+/***************************** public functions *******************************
+ */
 void System::incrementTrajectoryIterator()
 {
     m_trajectoryIterator++;
+}
+
+bool System::furtherTrajectoriePoints()
+{
+    if (m_trajectoryIterator < m_myPlan.trajectory_.joint_trajectory.points.size())
+        return true;
 }
 
 globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector)
@@ -231,20 +193,31 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
     // inforamtion for further excuting of positions.
     target = move_group->getCurrentPose();
 
+    // change the target orientation into a Quaternion Objetct
+    orientation.setX(target.pose.orientation.x);
+    orientation.setY(target.pose.orientation.y);
+    orientation.setZ(target.pose.orientation.z);
+    orientation.setW(target.pose.orientation.w);
+
     // take care and use the setEulerZYX. This calcualates the absoulte positin of the endeffector.
     // with the setRPY it always cals arelative movement!
-    orientation.setRPY( deg2rad(transformationVector.target_roll), deg2rad(transformationVector.target_pitch), deg2rad(transformationVector.target_yaw) );
+    rotation.setRPY( deg2rad(transformationVector.target_roll), deg2rad(transformationVector.target_pitch), deg2rad(transformationVector.target_yaw) );
 
+    // add the actueal orientation with the relatively movement.
+    orientation.operator*=(rotation);
+    
     orientation.normalize();
 
+    // change the target orientation with new calculated one
     target.pose.orientation.x = orientation.getX();
     target.pose.orientation.y = orientation.getY();
     target.pose.orientation.z = orientation.getZ();
     target.pose.orientation.w = orientation.getW();
 
-    target.pose.position.x = ((double) transformationVector.target_x/1000);
-    target.pose.position.y = ((double) transformationVector.target_y/1000);
-    target.pose.position.z = ((double) transformationVector.target_z/1000);
+    // add the new offeset to the catual position
+    target.pose.position.x = target.pose.position.x + ((double) transformationVector.target_x/1000);
+    target.pose.position.y = target.pose.position.y + ((double) transformationVector.target_y/1000);
+    target.pose.position.z = target.pose.position.z + ((double) transformationVector.target_z/1000);
 
     move_group->setPoseTarget(target);
     
@@ -349,29 +322,74 @@ void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teached
     }
 }
 
+/*************************** end public functions *****************************
+ */
 
-bool System::furtherTrajectoriePoints()
-{
-    if (m_trajectoryIterator < m_myPlan.trajectory_.joint_trajectory.points.size())
-        return true;
-}
-
-
-bool System::isTrajectoryPointReached()
-{
-    bool rc = m_trajectoryPointReached;
-    m_trajectoryPointReached = false;
-    return rc;
-}
+/************************** local private functions ***************************
+ */
 
 double System::rad2deg(double radian)
 {
-    double deg = radian * 180/pi;
+    double deg = radian * 180.0/pi;
+
+    return deg;
 }
 
 double System::deg2rad(int16_t degree)
 {
-    double rad = ((double) degree) * pi/180;
+    double rad = ((double) degree) * pi/180.0;
+
+    return rad;
+}
+
+double System::calcVelocity(int16_t velocityPercentig)
+{
+    double rc = 0.0;
+
+    rc = MAX_VELOCITY * (((double) velocityPercentig)/100.0) * pi * 2.0;
+
+    return rc;
+}
+
+/************************ end local private functions *************************
+ */
+
+/**************************** transmitter receiver ****************************
+ */
+
+void System::sendDataToArmCore()
+{
+    frost_robot_arm::SystemToArmCore msg;
+    
+    msg.dataID = GLOBALDATA_ID_ARM_CORE;
+    msg.operationEnable = m_transmitData.operationEnable;
+    msg.targetlArmCoreMode = m_transmitData.targetArmCoreMode;
+    msg.Endeffector_open = m_transmitData.Endeffector_open;
+    msg.targetPositions[0] = m_transmitData.targetPositions.JointAngle1;
+    msg.targetPositions[1] = m_transmitData.targetPositions.JointAngle2;
+    msg.targetPositions[2] = m_transmitData.targetPositions.JointAngle3;
+    msg.targetPositions[3] = m_transmitData.targetPositions.JointAngle4;
+    msg.targetPositions[4] = m_transmitData.targetPositions.JointAngle5;
+    msg.targetPositions[5] = m_transmitData.targetPositions.JointAngle6;
+    msg.targetVelocities[0] = m_transmitData.targetVelocities.JointVelocity1;
+    msg.targetVelocities[1] = m_transmitData.targetVelocities.JointVelocity2;
+    msg.targetVelocities[2] = m_transmitData.targetVelocities.JointVelocity3;
+    msg.targetVelocities[3] = m_transmitData.targetVelocities.JointVelocity4;
+    msg.targetVelocities[4] = m_transmitData.targetVelocities.JointVelocity5;
+    msg.targetVelocities[5] = m_transmitData.targetVelocities.JointVelocity6;
+    msg.targetAcceleration[0] = m_transmitData.targetAcceleration.JointAcceleration1;
+    msg.targetAcceleration[1] = m_transmitData.targetAcceleration.JointAcceleration2;
+    msg.targetAcceleration[2] = m_transmitData.targetAcceleration.JointAcceleration3;
+    msg.targetAcceleration[3] = m_transmitData.targetAcceleration.JointAcceleration4;
+    msg.targetAcceleration[4] = m_transmitData.targetAcceleration.JointAcceleration5;
+    msg.targetAcceleration[5] = m_transmitData.targetAcceleration.JointAcceleration6;
+
+    pub.publish(msg);
+
+    if(m_transmitData.operationEnable)
+        move_group->execute(m_myPlan);
+    else
+        move_group->stop();
 }
 
 void System::receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPtr& msg)
@@ -430,3 +448,5 @@ void System::receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPt
     }
 }
 
+/************************** end transmitter receiver **************************
+ */

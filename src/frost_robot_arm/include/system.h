@@ -25,7 +25,8 @@ private:
     void receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPtr& msg);
     double rad2deg(double rad);
     double deg2rad(int16_t degree);
-    int32_t calcVelocity(int16_t velocityPercentig);
+    double calcVelocity(int16_t velocityPercentig);
+    void init();
 
     globalData_typeDef_robotArm_MOTOR_ARM m_newReceivedData;
     globalData_typeDef_robotArm_MOTOR_ARM m_oldReceivedData;
@@ -39,24 +40,23 @@ private:
     ros::NodeHandle* m_rosNode;
     ros::AsyncSpinner* m_spinner;
     ros::Subscriber sub;
+    ros::Publisher pub;
 
 public:
-    void sendDataToArmCore(globalData_typeDef_robotArm_ARM_MOTOR TargetValues);
+    System(int argc, char** argv);
+    ~System();
     globalData_typeDef_robotArmVelocity setAxeVelocity(globalData_enumTypeDef_robotArmAxis axeIndex, int16_t velocityPercentig);
     void enableMovement();
     void disableMovement();
-    void init();
     void setEndeffectorClosed(bool state);
     void setArmCoreMode(globalData_enumTypeDef_robotArmCoreMode armCoreMode);
+    void setTargetTrajectoryPoint();
+    void setTargetVelocitiy(globalData_typeDef_robotArmVelocity targetVelocity);
     void calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teachedPos, bool collisionDetection);
     void calcNewTrajectory(globalData_typeDef_robotArm_posTransformation transformationVector, bool collisionDetection);
     globalData_typeDef_robotArmVelocity calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector);
-    void driveToTeachedPosition(globalData_enumTypeDef_robotArmTeachedPos value);
     void incrementTrajectoryIterator();
     bool isTrajectoryPointReached();
     bool furtherTrajectoriePoints();
-    void setTargetTrajectoryPoint();
-    void setTargetVelocitiy(globalData_typeDef_robotArmVelocity targetVelocity);
-    System(int argc, char** argv);
-    ~System();
+    void sendDataToArmCore();
 };

@@ -1,0 +1,16 @@
+<launch>
+
+    <arg name="real_arm" default="true" />
+
+    <include file="$(find frost_robot_arm)/launch/central_communication.launch">
+        <arg name="real_arm" value="$(arg real_arm)"/>
+    </include>
+
+    <include file="$(find frost_robot_arm)/launch/frost_robot_visualization.launch">
+        <arg name="real_arm" value="$(arg real_arm)"/>
+    </include>
+
+    <node name="frost_move_group" pkg="frost_robot_arm" type="frost_move_group">
+    </node>
+
+</launch>

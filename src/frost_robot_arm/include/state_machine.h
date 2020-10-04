@@ -13,16 +13,17 @@ private:
         MAX_LOCAL_STATES
     };
 
-
     int m_currentState;
     int m_currentMode;
 
     void enterStateStoped();
     void enterStateRunning();
     void enterStateReadyToRun();
+    void init();
 
 public:
-    void initStateMachine();
+    StateMachine();
+    ~StateMachine();
     void triggerModeChange(int newMode);
     void triggerStartMovement();
     void triggerStopMovement();
@@ -36,6 +37,4 @@ public:
     bool currentModePosMode();
     bool currentModeTeachedPosMode();
     bool axisHasChanged();
-    StateMachine();
-    ~StateMachine();
 };

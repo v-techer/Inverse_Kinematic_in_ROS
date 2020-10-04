@@ -8,6 +8,8 @@
 class Groundstation
 {
 private:
+    void init();
+    void resetData();
     int m_currentMode;
     globalData_enumTypeDef_robotArmAxis m_currentAxe;
     globalData_typeDef_robotArm_GS_ARM m_newData;
@@ -35,7 +37,6 @@ public:
     globalData_enumTypeDef_robotArmTeachedPos getTeachedPosition();
     globalData_typeDef_robotArm_posTransformation getPosition();
     globalData_typeDef_robotArm_posTransformation getJoyMovement();
-    void initGroundstation();
     Groundstation(int argc, char** argv);
     ~Groundstation();
 };

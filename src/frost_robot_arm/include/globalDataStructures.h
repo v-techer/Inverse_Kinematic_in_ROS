@@ -67,7 +67,8 @@ typedef enum
 	GLOBALDATA_ID_ARM				=	8,
 	GLOBALDATA_ID_POWERTRAIN		=	9,
 	GLOBALDATA_ID_SYSTEMSTATE		=	10,
-	GLOBALDATA_ID_IMU 				=  	11
+	GLOBALDATA_ID_IMU 				=  	11,
+	GLOBALDATA_ID_ARM_CORE			=   13
 }globalData_enumTypeDef_dataID;
 
 typedef enum

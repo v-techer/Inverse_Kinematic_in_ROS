@@ -1,6 +1,0 @@
-<launch>
-
-  <node name="frost_move_group" pkg="frost_robot_arm" type="frost_move_group" respawn="false" output="screen">
-  </node>
-
-</launch>
