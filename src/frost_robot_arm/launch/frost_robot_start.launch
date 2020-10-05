@@ -2,7 +2,7 @@
 
     <arg name="real_arm" default="true" />
 
-    <include file="$(find frost_robot_arm)/launch/central_communication.launch">
+    <include file="$(find frost_robot_arm)/launch/frost_robot_central_communication.launch">
         <arg name="real_arm" value="$(arg real_arm)"/>
     </include>
 
