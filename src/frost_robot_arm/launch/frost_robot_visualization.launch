@@ -22,7 +22,7 @@
   It also provides a GUI to move the simulated robot around "manually".
   This corresponds to moving around the real robot without the use of MoveIt.
   -->
-  <arg name="use_gui" default="true" />
+  <arg name="use_gui" default="false" />
   <arg name="use_rviz" default="true" />
 
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
@@ -33,13 +33,13 @@
   <!-- If needed, broadcast static tf for robot root -->
 
   <!-- We do not have a robot connected, so publish fake joint states -->
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" if="$(eval real_arm == false)">
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" if="$(eval real_arm == true)">
     <param name="use_gui" value="$(arg use_gui)"/>
     <rosparam param="source_list">[move_group/encoder_values]</rosparam>
   </node>
 
   <!-- We do not have a robot connected, so publish fake joint states -->
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" if="$(eval real_arm == true)">
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" if="$(eval real_arm == false)">
     <param name="use_gui" value="$(arg use_gui)"/>
     <rosparam param="source_list">[move_group/fake_controller_joint_states]</rosparam>
   </node>
