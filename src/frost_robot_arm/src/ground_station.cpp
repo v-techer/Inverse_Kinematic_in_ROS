@@ -67,6 +67,12 @@ void Groundstation::resetData()
     case ROBOTARMMODE_JOY:
         break;
     case ROBOTARMMODE_POSITION:
+        m_newData.targetCoordinate.target_pitch = 0;
+        m_newData.targetCoordinate.target_roll = 0;
+        m_newData.targetCoordinate.target_yaw = 0;
+        m_newData.targetCoordinate.target_x = 0;
+        m_newData.targetCoordinate.target_y = 0;
+        m_newData.targetCoordinate.target_z = 0;
         break;
     case ROBOTARMMODE_TEACHED_POS:
         m_newData.teachedPos = ROBOTARMTP_UNDEFINED;

@@ -29,6 +29,15 @@ static const std::string PLANNING_GROUP = "frost_arm";
 #define MAX_VELOCITY 10.0000
 const double pi = 3.141592654;
 
+// Visualization
+  // ^^^^^^^^^^^^^
+  //
+  // The package MoveItVisualTools provides many capabilties for visualizing objects, robots,
+  // and trajectories in RViz as well as debugging tools such as step-by-step introspection of a script
+
+namespace rvt = rviz_visual_tools;
+
+
 
 System::System(int argc, char** argv):
 m_positionReached(false)
@@ -67,6 +76,8 @@ void System::init()
     // Raw pointers are frequently used to refer to the planning group for improved performance.
     const robot_state::JointModelGroup* joint_model_group = 
         move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP);
+
+    visual_tools = new moveit_visual_tools::MoveItVisualTools("world");
 }
 
 /***************************** getter functions *******************************
@@ -96,6 +107,8 @@ void System::enableMovement()
 
 globalData_typeDef_robotArmVelocity System::setAxeVelocity(globalData_enumTypeDef_robotArmAxis axeIndex, int16_t velocityPercentig)
 {
+    visual_tools->deleteAllMarkers();
+    visual_tools->trigger();
     int32_t tempAxes[ROBOTARMAXIS_MAX_LOCAL_AXIS];
     globalData_typeDef_robotArmVelocity targetVelocity;
 
@@ -229,7 +242,11 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
     if (success)
     {
         ROS_INFO("position planning successfuly!");
-        
+
+        visual_tools->deleteAllMarkers();
+        visual_tools->trigger();
+
+        joint_model_group = move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP);    
     }
     // TODO add a return value with info about calculation. For example moveitErrorCode
 }
@@ -276,7 +293,11 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     if (success)
     {
         ROS_INFO("position planning successfuly!");
-        
+   
+        visual_tools->deleteAllMarkers();
+        visual_tools->publishAxisLabeled(move_group->getPoseTargets().back().pose , "goal");
+        visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
+        visual_tools->trigger();     
     }
     // TODO add a return value with info about calculation. For example moveitErrorCode
 }    
@@ -284,6 +305,7 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
 void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teachedPos, bool collisionDetection)
 {
     bool success = false;
+    std::string targetName;
 
     moveit::planning_interface::MoveItErrorCode errorCode;
 
@@ -295,7 +317,9 @@ void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teached
     //check if position is in range.
     if ( teachedPos < listOfTargetPositionNames.size())
     {
-        move_group->setNamedTarget(move_group->getNamedTargets()[teachedPos]);
+        targetName = move_group->getNamedTargets()[teachedPos];
+
+        move_group->setNamedTarget(targetName);
 
         // Now, we call the planner to compute the plan and visualize it.
         // Note that we are just planning, not asking move_group
@@ -309,6 +333,10 @@ void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teached
         if (success)
         {
             ROS_INFO("position planning successfuly!");
+
+            visual_tools->deleteAllMarkers();
+            visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
+            visual_tools->trigger();
 
             move_group->setJointValueTarget(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions);
 
