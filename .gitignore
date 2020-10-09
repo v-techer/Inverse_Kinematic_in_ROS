@@ -87,4 +87,4 @@ src/rviz_visual_tools/*
 src/test_frost_robot_arm/*
 src/.rosinstall
 src/.rosinstall.bak
-
+src/moveit_resources/*
