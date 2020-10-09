@@ -36,6 +36,7 @@ private:
     moveit::planning_interface::MoveGroupInterface* move_group;
     const robot_state::JointModelGroup* joint_model_group;
     moveit::planning_interface::MoveGroupInterface::Plan m_myPlan;
+    moveit_visual_tools::MoveItVisualTools *visual_tools;
     uint16_t m_trajectoryIterator;
     ros::NodeHandle* m_rosNode;
     ros::AsyncSpinner* m_spinner;

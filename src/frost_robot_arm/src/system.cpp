@@ -29,6 +29,13 @@ static const std::string PLANNING_GROUP = "frost_arm";
 #define MAX_VELOCITY 10.0000
 const double pi = 3.141592654;
 
+// Visualization
+  // ^^^^^^^^^^^^^
+  //
+  // The package MoveItVisualTools provides many capabilties for visualizing objects, robots,
+  // and trajectories in RViz as well as debugging tools such as step-by-step introspection of a script
+
+namespace rvt = rviz_visual_tools;
 
 System::System(int argc, char** argv):
 m_positionReached(false)
@@ -67,6 +74,8 @@ void System::init()
     // Raw pointers are frequently used to refer to the planning group for improved performance.
     const robot_state::JointModelGroup* joint_model_group = 
         move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP);
+
+    visual_tools = new moveit_visual_tools::MoveItVisualTools("world");
 }
 
 /***************************** getter functions *******************************
@@ -176,11 +185,18 @@ bool System::furtherTrajectoriePoints()
         return true;
 }
 
+const robot_state::JointModelGroup* joint_model_group;
+
 globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector)
 {
     bool success;
     
-    geometry_msgs::PoseStamped target;
+    geometry_msgs::Pose startTarget;
+    geometry_msgs::Pose endTarget;
+    std::vector<geometry_msgs::Pose> waypoints;
+    moveit_msgs::RobotTrajectory trajectory;
+    const double jump_threshold = 0.0;
+    const double eef_step = 0.01;
 
     tf2::Quaternion rotation;
     tf2::Quaternion orientation;
@@ -191,13 +207,19 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
 
     // get the current positon. The position is neccessery. It seems it conntains important
     // inforamtion for further excuting of positions.
-    target = move_group->getCurrentPose();
+    startTarget = move_group->getCurrentPose().pose;
+
+    // save the first actual state as target
+    waypoints.push_back(startTarget);
+
+    // copy all header data and overrite the actual position and orientation
+    endTarget = startTarget;
 
     // change the target orientation into a Quaternion Objetct
-    orientation.setX(target.pose.orientation.x);
-    orientation.setY(target.pose.orientation.y);
-    orientation.setZ(target.pose.orientation.z);
-    orientation.setW(target.pose.orientation.w);
+    orientation.setX(endTarget.orientation.x);
+    orientation.setY(endTarget.orientation.y);
+    orientation.setZ(endTarget.orientation.z);
+    orientation.setW(endTarget.orientation.w);
 
     // take care and use the setEulerZYX. This calcualates the absoulte positin of the endeffector.
     // with the setRPY it always cals arelative movement!
@@ -209,19 +231,19 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
     orientation.normalize();
 
     // change the target orientation with new calculated one
-    target.pose.orientation.x = orientation.getX();
-    target.pose.orientation.y = orientation.getY();
-    target.pose.orientation.z = orientation.getZ();
-    target.pose.orientation.w = orientation.getW();
+    endTarget.orientation.x = orientation.getX();
+    endTarget.orientation.y = orientation.getY();
+    endTarget.orientation.z = orientation.getZ();
+    endTarget.orientation.w = orientation.getW();
 
     // add the new offeset to the catual position
-    target.pose.position.x = target.pose.position.x + ((double) transformationVector.target_x/1000);
-    target.pose.position.y = target.pose.position.y + ((double) transformationVector.target_y/1000);
-    target.pose.position.z = target.pose.position.z + ((double) transformationVector.target_z/1000);
+    endTarget.position.x = endTarget.position.x + ((double) transformationVector.target_x/1000);
+    endTarget.position.y = endTarget.position.y + ((double) transformationVector.target_y/1000);
+    endTarget.position.z = endTarget.position.z + ((double) transformationVector.target_z/1000);
 
-    move_group->setPoseTarget(target);
-    
-    errorCode = move_group->plan(m_myPlan);
+    waypoints.push_back(endTarget);
+
+    move_group->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
 
     success = (errorCode == moveit::planning_interface::MoveItErrorCode::SUCCESS);
     
@@ -229,7 +251,6 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
     if (success)
     {
         ROS_INFO("position planning successfuly!");
-        
     }
     // TODO add a return value with info about calculation. For example moveitErrorCode
 }
@@ -276,8 +297,12 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     if (success)
     {
         ROS_INFO("position planning successfuly!");
-        
+
+        joint_model_group = move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP);
+
+        visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
     }
+
     // TODO add a return value with info about calculation. For example moveitErrorCode
 }    
 
@@ -450,3 +475,4 @@ void System::receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPt
 
 /************************** end transmitter receiver **************************
  */
+
