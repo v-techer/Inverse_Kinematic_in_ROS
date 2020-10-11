@@ -187,25 +187,19 @@ bool System::furtherTrajectoriePoints()
         return true;
 }
 
-const robot_state::JointModelGroup* joint_model_group;
-
 globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector)
 {
-    bool success;
-    
     geometry_msgs::Pose startTarget;
     geometry_msgs::Pose endTarget;
     std::vector<geometry_msgs::Pose> waypoints;
-    moveit_msgs::RobotTrajectory trajectory;
     const double jump_threshold = 0.0;
     const double eef_step = 0.01;
-
     tf2::Quaternion rotation;
     tf2::Quaternion orientation;
     tf2::Quaternion newOrientation;
-    moveit::planning_interface::MoveItErrorCode errorCode;
 
-    success = false;
+    // normailze the the values that get send for the orientation scale it down to 20 percont of input value
+    const double scale = 20;
 
     // get the current positon. The position is neccessery. It seems it conntains important
     // inforamtion for further excuting of positions.
@@ -225,7 +219,9 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
 
     // take care and use the setEulerZYX. This calcualates the absoulte positin of the endeffector.
     // with the setRPY it always cals arelative movement!
-    rotation.setRPY( deg2rad(transformationVector.target_roll), deg2rad(transformationVector.target_pitch), deg2rad(transformationVector.target_yaw) );
+    rotation.setRPY( deg2rad((double) transformationVector.target_roll*(scale/100.0)),
+                    deg2rad((double) transformationVector.target_pitch*(scale/100.0)),
+                    deg2rad((double) transformationVector.target_yaw*(scale/100.0)) );
 
     // add the actueal orientation with the relatively movement.
     orientation.operator*=(rotation);
@@ -245,19 +241,14 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
 
     waypoints.push_back(endTarget);
 
-    move_group->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+    // calculate out of the waypoints the trajectory and store it in m_myPlan.trajectory
+    move_group->computeCartesianPath(waypoints, eef_step, jump_threshold, m_myPlan.trajectory_);
 
-    success = (errorCode == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-    
-    // if calcualtion was successfuly save the new trajectory in in m_myPlan 
-    if (success)
-    {
-        ROS_INFO("position planning successfuly!");
-
-        visual_tools->deleteAllMarkers();
-        visual_tools->trigger();
-    }
-    // TODO add a return value with info about calculation. For example moveitErrorCode
+    visual_tools->deleteAllMarkers();
+    // visual_tools->publishPath(waypoints, rvt::LIME_GREEN, rvt::SMALL);
+    // for (std::size_t i = 0; i < waypoints.size(); ++i)
+    //     visual_tools->publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rvt::SMALL);
+    visual_tools->trigger();
 }
 
 void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation transformationVector, bool collisionDetection)
@@ -303,6 +294,7 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     {
         ROS_INFO("position planning successfuly!");
    
+        joint_model_group = move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP);   
         visual_tools->deleteAllMarkers();
         visual_tools->publishAxisLabeled(move_group->getPoseTargets().back().pose , "goal");
         visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
@@ -344,12 +336,11 @@ void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teached
         {
             ROS_INFO("position planning successfuly!");
 
+            joint_model_group = move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP); 
             visual_tools->deleteAllMarkers();
             visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
             visual_tools->trigger();
-
-            move_group->setJointValueTarget(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions);
-
+            // reset up trajectory iterator to 0.
             m_trajectoryIterator = 0;
         }
         // TODO add a return value with info about calculation. For example moveitErrorCode
@@ -373,7 +364,7 @@ double System::rad2deg(double radian)
     return deg;
 }
 
-double System::deg2rad(int16_t degree)
+double System::deg2rad(double degree)
 {
     double rad = ((double) degree) * pi/180.0;
 
@@ -488,4 +479,3 @@ void System::receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPt
 
 /************************** end transmitter receiver **************************
  */
-
