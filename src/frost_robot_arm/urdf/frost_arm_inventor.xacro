@@ -9,15 +9,6 @@
     <color rgba="0.8 0 0 1"/>
   </material>
 
-  <!--xacro:macro name="cube_inertial" params="width height depth mass *origin">
-    <inertial>
-      <mass value="${mass}" />
-      <xacro:insert_block name="origin" />
-      <inertia ixx="${0.0833333 * mass * (height * height + depth * depth)}" ixy="0.0" ixz="0.0"
-        iyy="${0.0833333 * mass * (width * width + depth * depth)}" iyz="0.0"
-        izz="${0.0833333 * mass * (width * width + height * height)}" />
-    </inertial>
-  </xacro:macro-->
 
   <!-- mass is entered in kg data a referenced from mikes robot arm in inventor -->
   <xacro:property name="link_base_mass" value="3.528" />
@@ -47,41 +38,41 @@
   <link name="link_base">
     <visual>
       <geometry>
-	      <box size="0.15 0.15 0.01"/>
+	      <mesh filename="package://frost_robot_arm/meshes/axe1.dae"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.005"/>
+      <origin rpy="4.712388981 0 0" xyz="0 0 0.005"/>
       <material name="blue"/>
     </visual>
     <collision>
       <geometry>
-	      <box size="0.15 0.15 0.01"/>
+	      <mesh filename="package://frost_robot_arm/meshes/axe1.dae"/>
       </geometry>
       <material name="red"/>
-      <origin rpy="0 0 0" xyz="0 0 0.0025"/>
+      <origin rpy="4.712388981 0 0" xyz="0 0 0.0025"/>
     </collision>
     <inertial>
     <!-- inventor gaves the inertia of a subassambly centerpoint in kg*mm^2-->
-    <mass value="${link_base_mass}"/>
-    <inertia ixx="12943.301" ixy="920.962"   ixz="2494.072"
-                             iyy="34752.194" iyz="-1338.493"
-                                             izz="27487.656"/>
+      <mass value="${link_base_mass}"/>
+      <inertia ixx="12943.301" ixy="920.962"   ixz="2494.072"
+                               iyy="34752.194" iyz="-1338.493"
+                                               izz="27487.656"/>
     </inertial>
   </link>
 
   <link name="link_0">
     <visual>
       <geometry>
-	      <box size="0.1 0.1 0.1"/>
+	      <mesh filename="package://frost_robot_arm/meshes/axe2.dae"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.05"/>
+      <origin rpy="0 0 0" xyz="0.052 -0.5615 -0.07"/>
       <material name="blue"/>
     </visual>
     <collision>
       <geometry>
-	      <box size="0.1 0.1 0.1"/>
+	      <mesh filename="package://frost_robot_arm/meshes/axe2.dae"/>
       </geometry>
       <material name="red"/>
-      <origin rpy="0 0 0" xyz="0 0 0.05"/>
+      <origin rpy="0 0 0" xyz="0.052 -0.5615 -0.07"/>
     </collision>
     <inertial>
     <!-- inventor gaves the inertia of a subassambly centerpoint in kg*mm^2-->
@@ -106,17 +97,17 @@
   <link name="link_1">
     <visual>
       <geometry>
-	      <box size="0.1 0.1 0.43"/>
+	      <mesh filename="package://frost_robot_arm/meshes/axe3.dae"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.215"/>
+      <origin rpy="4.712388981 0 -1.570796327" xyz="-0.0043 -0.019 0.40"/>
       <material name="blue"/>
     </visual>
     <collision>
       <geometry>
-	      <box size="0.1 0.1 0.35"/>
+	      <mesh filename="package://frost_robot_arm/meshes/axe3.dae"/>
       </geometry>
       <material name="red"/>
-      <origin rpy="0 0 0" xyz="0 0 0.215"/>
+      <origin rpy="4.712388981 0 1.570796327" xyz="0.0 0.019 0.44"/>
     </collision>
     <inertial>
     <!-- inventor gaves the inertia of a subassambly centerpoint in kg*mm^2-->
@@ -125,7 +116,7 @@
                                 iyy="11131.504" iyz="-3760.304"
                                                 izz="85698.080" />
     </inertial>
-    </link>
+  </link>
 
 
   <joint name="joint1" type="revolute">
@@ -146,16 +137,16 @@
   <link name="link_2">
     <visual>
       <geometry>
-        <box size="0.08 0.08 0.21"/>
+	      <mesh filename="package://frost_robot_arm/meshes/axe4.dae"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <origin rpy="0 0 3.141592654" xyz="-0.02 0.02 0.255"/>
       <material name="blue"/>
     </visual>
     <collision>
       <geometry>
-        <box size="0.08 0.08 0.21"/>
+	      <mesh filename="package://frost_robot_arm/meshes/axe4.dae"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0 0 0.105"/>
+      <origin rpy="0 0 0" xyz="0 0 0.255"/>
       <material name="red"/>
     </collision>
     <inertial>
