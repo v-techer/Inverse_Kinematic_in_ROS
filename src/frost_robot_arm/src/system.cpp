@@ -192,6 +192,7 @@ bool System::furtherTrajectoriePoints()
 globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector)
 {
     bool success;
+    globalData_typeDef_robotArmVelocity joint_velocitiy;
     
     geometry_msgs::PoseStamped target;
 
@@ -238,17 +239,8 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
 
     success = (errorCode == moveit::planning_interface::MoveItErrorCode::SUCCESS);
     
-    // if calcualtion was successfuly save the new trajectory in in m_myPlan 
-    if (success)
-    {
-        ROS_INFO("position planning successfuly!");
-
-        visual_tools->deleteAllMarkers();
-        visual_tools->trigger();
-
-        joint_model_group = move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP);    
-    }
-    // TODO add a return value with info about calculation. For example moveitErrorCode
+    visual_tools->deleteAllMarkers();
+    visual_tools->trigger();
 }
 
 void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation transformationVector, bool collisionDetection)
@@ -294,6 +286,8 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     {
         ROS_INFO("position planning successfuly!");
    
+        // get joint Module Group of move_group current state and update joint_model_group
+        joint_model_group = move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP); 
         visual_tools->deleteAllMarkers();
         visual_tools->publishAxisLabeled(move_group->getPoseTargets().back().pose , "goal");
         visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
@@ -334,12 +328,14 @@ void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teached
         {
             ROS_INFO("position planning successfuly!");
 
+            // get joint Module Group of move_group current state and update joint_model_group
+            joint_model_group = move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP); 
+
             visual_tools->deleteAllMarkers();
             visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
             visual_tools->trigger();
 
-            move_group->setJointValueTarget(m_myPlan.trajectory_.joint_trajectory.points.at(0).positions);
-
+            // reset up trajectory iterator to 0.
             m_trajectoryIterator = 0;
         }
         // TODO add a return value with info about calculation. For example moveitErrorCode

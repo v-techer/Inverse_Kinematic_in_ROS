@@ -6,6 +6,6 @@
 
   <!-- Load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args=""/>
+    output="screen" args="frost_arm_trajectory_controller frost_arm_position_controller frost_hand_position_controller "/>
 
 </launch>
