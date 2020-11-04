@@ -104,7 +104,7 @@
      it multiples up to 15.3 * 54/24 = 34.425. This creates a ration of 34.425:1-->
     <!-- form datasheet permited repeatable peak torque 176Nm-->
     <!-- with a ratio of 34.425 and a maximal motor speed of 2000 rad/min, we get a maximal output speed of 58 rad/min-->
-    <limit effort="87" lower="-3.141592654" upper="3.141592654" velocity="58"/>
+    <limit effort="31" lower="-3.141592654" upper="3.141592654" velocity="58"/>
   </joint>
 
   <link name="link_1">
@@ -143,7 +143,7 @@
     <!--effort specification for the HFUC-25-160-2UH: https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019644_HFUC_2UH.pdf -->
     <!-- form datasheet permited repeatable peak torque 176Nm-->
     <!-- with a ratio of 160 and a maximal motor speed of XXX rad/min, we get a maximal output speed of XXX rad/min-->
-    <limit effort="176" lower="-1.570796327" upper="1.570796327" velocity="41"/>
+    <limit effort="472" lower="-1.570796327" upper="1.570796327" velocity="41"/>
   </joint>
 
   <link name="link_2">
@@ -181,7 +181,7 @@
     <!--effort specification for the CSG-17-120-2UH: https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019642_CSG_2UH.pdf -->
     <!-- form datasheet permited repeatable peak torque 176Nm-->
     <!-- with a ratio of 120 and a maximal motor speed of XXX rad/min, we get a maximal output speed of XXX rad/min-->
-    <limit effort="70" lower="-2.268928027593" upper="2.617993877991" velocity="72"/>
+    <limit effort="109" lower="-2.268928027593" upper="2.617993877991" velocity="72"/>
   </joint>
 
   <link name="link_3">
@@ -220,7 +220,7 @@
     <!--effort specification for the CSF-14-100-2XH : https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019649_CSF_Mini.pdf -->
     <!-- form datasheet permited repeatable peak torque 28Nm-->
     <!-- with a ratio of 100 and a maximal motor speed of XXX rad/min, we get a maximal output speed of XXX rad/min-->
-    <limit effort="28" lower="-2.705260340591" upper="2.705260340591" velocity="60"/>
+    <limit effort="91" lower="-2.705260340591" upper="2.705260340591" velocity="60"/>
   </joint>
 
 
@@ -260,7 +260,7 @@
     <!--effort specification for the CSG-17-120-2UH: https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019642_CSG_2UH.pdf --> 
     <!-- form datasheet permited repeatable peak torque 70Nm-->
     <!-- with a ratio of 120 and a maximal motor speed of XXX rad/min, we get a maximal output speed of XXX rad/min-->
-    <limit effort="70" lower="-1.570796326795" upper="1.570796326795" velocity="113"/>
+    <limit effort="109" lower="-1.570796326795" upper="1.570796326795" velocity="113"/>
   </joint>
 
   <link name="link_5">
