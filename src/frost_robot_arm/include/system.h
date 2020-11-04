@@ -24,7 +24,7 @@ class System
 private:
     void receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPtr& msg);
     double rad2deg(double rad);
-    double deg2rad(int16_t degree);
+    double deg2rad(double degree);
     double calcVelocity(int16_t velocityPercentig);
     void init();
 

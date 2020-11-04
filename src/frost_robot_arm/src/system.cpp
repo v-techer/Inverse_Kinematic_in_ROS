@@ -37,8 +37,6 @@ const double pi = 3.141592654;
 
 namespace rvt = rviz_visual_tools;
 
-
-
 System::System(int argc, char** argv):
 m_positionReached(false)
 {
@@ -191,31 +189,39 @@ bool System::furtherTrajectoriePoints()
 
 globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector)
 {
-    bool success;
-    globalData_typeDef_robotArmVelocity joint_velocitiy;
-    
-    geometry_msgs::PoseStamped target;
-
+    geometry_msgs::Pose startTarget;
+    geometry_msgs::Pose endTarget;
+    std::vector<geometry_msgs::Pose> waypoints;
+    const double jump_threshold = 0.0;
+    const double eef_step = 0.01;
     tf2::Quaternion rotation;
     tf2::Quaternion orientation;
     tf2::Quaternion newOrientation;
-    moveit::planning_interface::MoveItErrorCode errorCode;
 
-    success = false;
+    // normailze the the values that get send for the orientation scale it down to 20 percont of input value
+    const double scale = 20;
 
     // get the current positon. The position is neccessery. It seems it conntains important
     // inforamtion for further excuting of positions.
-    target = move_group->getCurrentPose();
+    startTarget = move_group->getCurrentPose().pose;
+
+    // save the first actual state as target
+    waypoints.push_back(startTarget);
+
+    // copy all header data and overrite the actual position and orientation
+    endTarget = startTarget;
 
     // change the target orientation into a Quaternion Objetct
-    orientation.setX(target.pose.orientation.x);
-    orientation.setY(target.pose.orientation.y);
-    orientation.setZ(target.pose.orientation.z);
-    orientation.setW(target.pose.orientation.w);
+    orientation.setX(endTarget.orientation.x);
+    orientation.setY(endTarget.orientation.y);
+    orientation.setZ(endTarget.orientation.z);
+    orientation.setW(endTarget.orientation.w);
 
     // take care and use the setEulerZYX. This calcualates the absoulte positin of the endeffector.
     // with the setRPY it always cals arelative movement!
-    rotation.setRPY( deg2rad(transformationVector.target_roll), deg2rad(transformationVector.target_pitch), deg2rad(transformationVector.target_yaw) );
+    rotation.setRPY( deg2rad((double) transformationVector.target_roll*(scale/100.0)),
+                    deg2rad((double) transformationVector.target_pitch*(scale/100.0)),
+                    deg2rad((double) transformationVector.target_yaw*(scale/100.0)) );
 
     // add the actueal orientation with the relatively movement.
     orientation.operator*=(rotation);
@@ -223,23 +229,25 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
     orientation.normalize();
 
     // change the target orientation with new calculated one
-    target.pose.orientation.x = orientation.getX();
-    target.pose.orientation.y = orientation.getY();
-    target.pose.orientation.z = orientation.getZ();
-    target.pose.orientation.w = orientation.getW();
+    endTarget.orientation.x = orientation.getX();
+    endTarget.orientation.y = orientation.getY();
+    endTarget.orientation.z = orientation.getZ();
+    endTarget.orientation.w = orientation.getW();
 
     // add the new offeset to the catual position
-    target.pose.position.x = target.pose.position.x + ((double) transformationVector.target_x/1000);
-    target.pose.position.y = target.pose.position.y + ((double) transformationVector.target_y/1000);
-    target.pose.position.z = target.pose.position.z + ((double) transformationVector.target_z/1000);
+    endTarget.position.x = endTarget.position.x + ((double) transformationVector.target_x/1000);
+    endTarget.position.y = endTarget.position.y + ((double) transformationVector.target_y/1000);
+    endTarget.position.z = endTarget.position.z + ((double) transformationVector.target_z/1000);
 
-    move_group->setPoseTarget(target);
-    
-    errorCode = move_group->plan(m_myPlan);
+    waypoints.push_back(endTarget);
 
-    success = (errorCode == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-    
+    // calculate out of the waypoints the trajectory and store it in m_myPlan.trajectory
+    move_group->computeCartesianPath(waypoints, eef_step, jump_threshold, m_myPlan.trajectory_);
+
     visual_tools->deleteAllMarkers();
+    // visual_tools->publishPath(waypoints, rvt::LIME_GREEN, rvt::SMALL);
+    // for (std::size_t i = 0; i < waypoints.size(); ++i)
+    //     visual_tools->publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rvt::SMALL);
     visual_tools->trigger();
 }
 
@@ -291,8 +299,9 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
         visual_tools->deleteAllMarkers();
         visual_tools->publishAxisLabeled(move_group->getPoseTargets().back().pose , "goal");
         visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
-        visual_tools->trigger();     
+        visual_tools->trigger();
     }
+
     // TODO add a return value with info about calculation. For example moveitErrorCode
 }    
 
@@ -359,7 +368,7 @@ double System::rad2deg(double radian)
     return deg;
 }
 
-double System::deg2rad(int16_t degree)
+double System::deg2rad(double degree)
 {
     double rad = ((double) degree) * pi/180.0;
 
