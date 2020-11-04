@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /MotionPlanning1
         - /TF1
-        - /TF1/Tree1/world1/link_base1
+        - /MarkerArray1
       Splitter Ratio: 0.7425600290298462
     Tree Height: 790
   - Class: rviz/Help
@@ -292,6 +292,14 @@ Visualization Manager:
                           right_tip:
                             {}
       Update Interval: 0
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /rviz_visual_tools
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
