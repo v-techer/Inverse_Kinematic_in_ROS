@@ -10,7 +10,7 @@
         <arg name="real_arm" value="$(arg real_arm)"/>
     </include>
 
-    <!--node name="frost_move_group" pkg="frost_robot_arm" type="frost_move_group">
+    <!--node name="frost_robot_arm" pkg="frost_robot_arm" type="frost_robot_arm">
     </node-->
 
 </launch>

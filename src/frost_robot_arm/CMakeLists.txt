@@ -65,9 +65,9 @@ find_package(Boost REQUIRED system filesystem date_time thread)
 ## Generate messages in the 'msg' folder
  add_message_files(
    FILES
-   ViewTemplate.msg
-   GroundstationToRobotarm.msg
+   ArmCoreToRobotarm.msg
    ArmCoreToSystem.msg
+   GroundstationToRobotarm.msg
    SystemToArmCore.msg
 #   Message2.msg
  )
@@ -159,13 +159,9 @@ include_directories(include ${THIS_PACKAGE_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} 
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/frost_robot_arm_node.cpp)
-add_executable(test_debug src/test_debug.cpp)
-add_executable(state_publisher src/state_publisher.cpp)
-add_executable(frost_move_group_example src/frost_move_group_example.cpp src/system.cpp)
-add_executable(frost_move_group src/frost_move_group.cpp src/ground_station.cpp src/state_machine.cpp src/system.cpp)
-add_executable(panda_move_group src/panda_move_group.cpp)
-add_executable(frost_joy_controller src/frost_joy_controller.cpp)
-add_executable(test_controller_robotarm src/test_controller_robotarm.cpp)
+add_executable(encoder_state_publisher src/encoder_state_publisher.cpp)
+add_executable(frost_robot_arm src/main.cpp src/ground_station.cpp src/state_machine.cpp src/system.cpp)
+add_executable(move_group_example src/move_group_example.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -182,13 +178,9 @@ add_executable(test_controller_robotarm src/test_controller_robotarm.cpp)
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries(state_publisher ${catkin_LIBRARIES})
-target_link_libraries(test_debug ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(frost_move_group_example ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(frost_move_group ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(panda_move_group ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(frost_joy_controller ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(test_controller_robotarm ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(encoder_state_publisher ${catkin_LIBRARIES})
+target_link_libraries(frost_robot_arm ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(move_group_example ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 
 #############
@@ -210,7 +202,7 @@ target_link_libraries(test_controller_robotarm ${catkin_LIBRARIES} ${Boost_LIBRA
 # install(TARGETS ${PROJECT_NAME}_node
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-install(TARGETS test_debug frost_move_group_example frost_move_group panda_move_group frost_joy_controller test_controller_robotarm DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS encoder_state_publisher frost_robot_arm move_group_example DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html

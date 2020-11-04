@@ -4,7 +4,9 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /MarkerArray1
+        - /MotionPlanning1
+        - /TF1
+        - /TF1/Tree1/world1/link_base1
       Splitter Ratio: 0.7425600290298462
     Tree Height: 790
   - Class: rviz/Help
@@ -39,7 +41,7 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
-    - Acceleration_Scaling_Factor: 1
+    - Acceleration_Scaling_Factor: 0.1
       Class: moveit_rviz_plugin/MotionPlanning
       Enabled: true
       Move Group Namespace: ""
@@ -47,7 +49,6 @@ Visualization Manager:
       MoveIt_Allow_External_Program: false
       MoveIt_Allow_Replanning: false
       MoveIt_Allow_Sensor_Positioning: false
-      MoveIt_Goal_Tolerance: 0
       MoveIt_Planning_Attempts: 10
       MoveIt_Planning_Time: 5
       MoveIt_Use_Cartesian_Path: false
@@ -136,7 +137,7 @@ Visualization Manager:
         Robot Alpha: 0.5
         Robot Color: 150; 50; 150
         Show Robot Collision: false
-        Show Robot Visual: false
+        Show Robot Visual: true
         Show Trail: false
         State Display Time: 0.05 s
         Trail Step Size: 1
@@ -240,7 +241,7 @@ Visualization Manager:
         Show Robot Collision: false
         Show Robot Visual: true
       Value: true
-      Velocity_Scaling_Factor: 1
+      Velocity_Scaling_Factor: 0.1
     - Class: rviz/TF
       Enabled: true
       Frame Timeout: 15
@@ -263,16 +264,16 @@ Visualization Manager:
         link_5:
           Value: true
         link_base:
-          Value: true
+          Value: false
         right_gripper:
           Value: false
         right_tip:
           Value: false
         world:
-          Value: false
+          Value: true
       Marker Scale: 1
       Name: TF
-      Show Arrows: true
+      Show Arrows: false
       Show Axes: true
       Show Names: false
       Tree:
@@ -291,14 +292,6 @@ Visualization Manager:
                           right_tip:
                             {}
       Update Interval: 0
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: /rviz_visual_tools
-      Name: MarkerArray
-      Namespaces:
-        {}
-      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -331,24 +324,24 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6997967958450317
+      Pitch: 0.6397968530654907
       Target Frame: world
       Value: XYOrbit (rviz)
-      Yaw: 4.6349382400512695
+      Yaw: 4.6599273681640625
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: false
+    collapsed: true
   Height: 1025
   Help:
     collapsed: false
-  Hide Left Dock: false
+  Hide Left Dock: true
   Hide Right Dock: false
   MotionPlanning:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002a2000003a7fc0200000007fb000000100044006900730070006c006100790073010000003d000003a7000000c900fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a400fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004100fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067000000024f000001950000018900ffffff00000495000003a700000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000002a2000003a7fc0200000007fb000000100044006900730070006c006100790073000000003d000003a7000000c900fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a400fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004100fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067000000025b000001890000017d00ffffff0000073d000003a700000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
   Width: 1853

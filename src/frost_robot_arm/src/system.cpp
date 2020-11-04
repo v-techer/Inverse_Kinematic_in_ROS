@@ -294,7 +294,8 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     {
         ROS_INFO("position planning successfuly!");
    
-        joint_model_group = move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP);   
+        // get joint Module Group of move_group current state and update joint_model_group
+        joint_model_group = move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP); 
         visual_tools->deleteAllMarkers();
         visual_tools->publishAxisLabeled(move_group->getPoseTargets().back().pose , "goal");
         visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
@@ -336,10 +337,13 @@ void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teached
         {
             ROS_INFO("position planning successfuly!");
 
+            // get joint Module Group of move_group current state and update joint_model_group
             joint_model_group = move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP); 
+
             visual_tools->deleteAllMarkers();
             visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
             visual_tools->trigger();
+
             // reset up trajectory iterator to 0.
             m_trajectoryIterator = 0;
         }
