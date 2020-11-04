@@ -273,32 +273,12 @@ int main(int argc, char** argv)
           sys.enableMovement();
 
           sys.setTargetVelocitiy(sys.calcNewVelocity(gnd.getJoyMovement()));
-
-          if(gnd.newJoyMovement())
-          {
-            st.triggerNextPosition();
-          }
         }
         else
         {
           st.triggerStopMovement();
         }
         
-      }
-
-      if (st.statusIsReadyToRun())
-      {
-        if (gnd.movementIsEnabled())
-        {
-          if (gnd.newJoyMovement())
-          {
-            st.triggerNextPosition();
-          }
-        }
-        else
-        {
-          st.triggerStopMovement();
-        }
       }
 
       if (st.statusIsStopped())
