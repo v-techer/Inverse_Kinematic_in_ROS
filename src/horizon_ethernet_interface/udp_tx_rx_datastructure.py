@@ -11,6 +11,7 @@ import struct  # packing and unpacking byte objects in specified c types
 #Message related imports
 from horizon_ethernet_interface.msg import GroundstationToRobotarm
 from horizon_ethernet_interface.msg import ArmCoreToRobotarm
+from horizon_ethernet_interface.msg import RobotarmToGroundstation
 
 
 class DataClass:
@@ -61,6 +62,7 @@ class Groundstation(DataClass):
 		DataClass.__init__(self)
 
 		self.groundstation_to_ik_solver = rospy.Publisher('groundstation_to_ik_solver', GroundstationToRobotarm, queue_size=1)
+		rospy.Subscriber('ik_solver_to_groundstation', RobotarmToGroundstation, self.callbackRobotState)
 
 		self.BoschEMU_EMU_GS_types = [	'B',  # dataID
 										'f',  # xEuler
@@ -229,6 +231,26 @@ class Groundstation(DataClass):
 		self.Jetson_FusedPosition_GS = [	self.Jetson_FusedPosition_GS_list,
 											self.Jetson_FusedPosition_GS_types,
 											self.Jetson_FusedPosition_GS_keys]	
+
+	def callbackRobotState(self, msg):
+		self.RobotArm_ARM_GS_list[1] = msg.status
+		self.RobotArm_ARM_GS_list[2] = msg.mode
+		self.RobotArm_ARM_GS_list[3] = msg.gripperStatate
+		self.RobotArm_ARM_GS_list[4] = msg.targetCoordinate_target_x
+		self.RobotArm_ARM_GS_list[5] = msg.targetCoordinate_target_y
+		self.RobotArm_ARM_GS_list[6] = msg.targetCoordinate_target_z
+		self.RobotArm_ARM_GS_list[7] = msg.targetCoordinate_target_roll
+		self.RobotArm_ARM_GS_list[8] = msg.targetCoordinate_target_pitch
+		self.RobotArm_ARM_GS_list[9] = msg.targetCoordinate_target_yaw
+		self.RobotArm_ARM_GS_list[10] = msg.actualJointAngle1
+		self.RobotArm_ARM_GS_list[11] = msg.actualJointAngle2
+		self.RobotArm_ARM_GS_list[12] = msg.actualJointAngle3
+		self.RobotArm_ARM_GS_list[13] = msg.actualJointAngle4
+		self.RobotArm_ARM_GS_list[14] = msg.actualJointAngle5
+		self.RobotArm_ARM_GS_list[15] = msg.actualJointAngle6
+
+		rospy.loginfo(msg)
+
 	def getAddress(self):
 		return self.address
 
@@ -265,7 +287,8 @@ class Groundstation(DataClass):
 			msg.dummy0 = temp_dict[self.getIndexByKey(rx_id, 'RX', 'dummy0')]
 			msg.dummy1 = temp_dict[self.getIndexByKey(rx_id, 'RX', 'dummy1')]
 			msg.dummy2 = temp_dict[self.getIndexByKey(rx_id, 'RX', 'dummy2')]
-			rospy.loginfo(msg)
+
+			#rospy.loginfo(msg)
 			
 			# publish message
 			self.groundstation_to_ik_solver.publish(msg)
@@ -275,9 +298,9 @@ class Groundstation(DataClass):
 		data_in_byte_object = bytes()
 
 		for i, key in enumerate(self.RobotArm_ARM_GS_keys.values()):
+			
 			value = self.getValueByIndex(i, 'TX')
-			if i > 0:
-				value = 44
+
 			data_in_byte_object += struct.pack(''+self.id2types(self.ID_ARM, 'TX')[i], value)
 
 		return data_in_byte_object
@@ -290,11 +313,17 @@ class Groundstation(DataClass):
 		if direction_ is 'RX':
 			if id_ is ID_ARM:
 				self.RobotArm_GS_ARM_list = recv_data
+		if direction_ is 'TX':
+			if id_ is ID_ARM:
+				self.RobotArm_ARM_GS_list = recv_data
 
 	def getIndexByKey(self, id_, direction_, key_):
 		if direction_ is 'RX':
 			if id_ is ID_ARM:
 				return self.RobotArm_GS_ARM_keys[key_]
+		if direction_ is 'TX':
+			if id_ is ID_ARM:
+				return self.RobotArm_ARM_GS_keys[key_]
 				
 
 	def id2types(self, id_, direction_):
@@ -614,7 +643,7 @@ class ArmCore(DataClass):
 									self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition5'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition6'), 'RX')]
 			msg.dummy = [0, 0]
 			
-			rospy.loginfo(msg)
+			#rospy.loginfo(msg)
 			
 			# publish message
 			self.arm_core_to_ik_solver.publish(msg)

@@ -21,7 +21,7 @@ private:
     ros::NodeHandle* m_rosNode;
     ros::AsyncSpinner* m_spinner;
     ros::Subscriber sub;
-
+    ros::Publisher pub;
 
 public:
     bool movementIsEnabled();
@@ -32,6 +32,7 @@ public:
     bool newTeachedPosition();
     bool getEndEffectorState();
     int getCurrentMode();
+    void sendDataToGroundstation();
     globalData_enumTypeDef_robotArmAxis getAxe();
     int16_t getVelocitiyPercentig();
     globalData_enumTypeDef_robotArmTeachedPos getTeachedPosition();

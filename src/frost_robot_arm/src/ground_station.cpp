@@ -4,7 +4,7 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 
-#include "frost_robot_arm/ViewTemplate.h"
+#include "frost_robot_arm/RobotarmToGroundstation.h"
 #include "frost_robot_arm/GroundstationToRobotarm.h"
 #include "ground_station.h"
 #include "globalDataStructures.h"
@@ -22,6 +22,9 @@ m_currentMode(-1)
     m_spinner = new ros::AsyncSpinner(1);
     
     sub = m_rosNode->subscribe("groundstation_to_ik_solver", 1000, &Groundstation::receiveDataCallback, this);
+
+    // initate ros transmitter function
+    pub = m_rosNode->advertise<frost_robot_arm::RobotarmToGroundstation>("ik_solver_to_groundstation", 1);
 
     m_spinner->start();
 
@@ -148,6 +151,29 @@ bool Groundstation::getEndEffectorState()
     return (bool) m_newData.endEffectorState;
 }
 
+void Groundstation::sendDataToGroundstation()
+{
+    frost_robot_arm::RobotarmToGroundstation msg;
+
+    msg.status = 12;
+    msg.mode = 11;
+    msg.gripperStatate= 10;
+    msg.targetCoordinate_target_x = 9;
+    msg.targetCoordinate_target_y = 8;
+    msg.targetCoordinate_target_z = 7;
+    msg.targetCoordinate_target_roll = 6;
+    msg.targetCoordinate_target_pitch = 5;
+    msg.targetCoordinate_target_yaw = 4;
+    msg.actualJointAngle1 = 3;
+    msg.actualJointAngle2 = 2;
+    msg.actualJointAngle3 = 1;
+    msg.actualJointAngle4 = 0;
+    msg.actualJointAngle5 = 13;
+    msg.actualJointAngle6 = 14;
+
+    pub.publish(msg);
+}
+
 void Groundstation::receiveDataCallback(const frost_robot_arm::GroundstationToRobotarm::ConstPtr& msg)
 {
 
@@ -197,21 +223,21 @@ void Groundstation::receiveDataCallback(const frost_robot_arm::GroundstationToRo
     /* for Joy movement alle incomming positions are neccessery. if new data are awalyble inform the state machine*/
     m_newJoyMovement = true;
 
-    ROS_INFO("dataID: [%d]", msg->dataID);
-    ROS_INFO("mode: [%d]", msg->mode);
-    ROS_INFO("teached_pos: [%d]", msg->teached_pos);
-    ROS_INFO("active_axis: [%d]", msg->active_axis);
-    ROS_INFO("axis_velocity: [%d]", msg->axis_velocity);
-    ROS_INFO("target_x: [%d]", msg->target_x);
-    ROS_INFO("target_y: [%d]", msg->target_y);
-    ROS_INFO("target_z: [%d]", msg->target_z);
-    ROS_INFO("target_roll: [%d]", msg->target_roll);
-    ROS_INFO("target_pitch: [%d]", msg->target_pitch);
-    ROS_INFO("target_yaw: [%d]", msg->target_yaw);
-    ROS_INFO("gripper_status: [%d]", msg->gripper_status);
-    ROS_INFO("movementStarted: [%d]", msg->movementStarted);
-    ROS_INFO("collisionDetection: [%d]", msg->collisionDetection);
-    ROS_INFO("dummy0: [%d]", msg->dummy0);
-    ROS_INFO("dummy1: [%d]", msg->dummy1);
-    ROS_INFO("dummy2: [%d]", msg->dummy2);
+    // ROS_INFO("dataID: [%d]", msg->dataID);
+    // ROS_INFO("mode: [%d]", msg->mode);
+    // ROS_INFO("teached_pos: [%d]", msg->teached_pos);
+    // ROS_INFO("active_axis: [%d]", msg->active_axis);
+    // ROS_INFO("axis_velocity: [%d]", msg->axis_velocity);
+    // ROS_INFO("target_x: [%d]", msg->target_x);
+    // ROS_INFO("target_y: [%d]", msg->target_y);
+    // ROS_INFO("target_z: [%d]", msg->target_z);
+    // ROS_INFO("target_roll: [%d]", msg->target_roll);
+    // ROS_INFO("target_pitch: [%d]", msg->target_pitch);
+    // ROS_INFO("target_yaw: [%d]", msg->target_yaw);
+    // ROS_INFO("gripper_status: [%d]", msg->gripper_status);
+    // ROS_INFO("movementStarted: [%d]", msg->movementStarted);
+    // ROS_INFO("collisionDetection: [%d]", msg->collisionDetection);
+    // ROS_INFO("dummy0: [%d]", msg->dummy0);
+    // ROS_INFO("dummy1: [%d]", msg->dummy1);
+    // ROS_INFO("dummy2: [%d]", msg->dummy2);
 }
