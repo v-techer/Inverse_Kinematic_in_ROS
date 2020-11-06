@@ -32,7 +32,7 @@ public:
     bool newTeachedPosition();
     bool getEndEffectorState();
     int getCurrentMode();
-    void sendDataToGroundstation();
+    void sendDataToGroundstation(globalData_typeDef_robotArm_MOTOR_ARM armCoreData, globalData_typeDef_robotArm_posTransformation cartesianPosition);
     globalData_enumTypeDef_robotArmAxis getAxe();
     int16_t getVelocitiyPercentig();
     globalData_enumTypeDef_robotArmTeachedPos getTeachedPosition();

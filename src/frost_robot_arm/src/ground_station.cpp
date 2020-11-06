@@ -151,25 +151,25 @@ bool Groundstation::getEndEffectorState()
     return (bool) m_newData.endEffectorState;
 }
 
-void Groundstation::sendDataToGroundstation()
+void Groundstation::sendDataToGroundstation(globalData_typeDef_robotArm_MOTOR_ARM armCoreData, globalData_typeDef_robotArm_posTransformation cartesianPosition)
 {
     frost_robot_arm::RobotarmToGroundstation msg;
 
-    msg.status = 12;
-    msg.mode = 11;
-    msg.gripperStatate= 10;
-    msg.targetCoordinate_target_x = 9;
-    msg.targetCoordinate_target_y = 8;
-    msg.targetCoordinate_target_z = 7;
-    msg.targetCoordinate_target_roll = 6;
-    msg.targetCoordinate_target_pitch = 5;
-    msg.targetCoordinate_target_yaw = 4;
-    msg.actualJointAngle1 = 3;
-    msg.actualJointAngle2 = 2;
-    msg.actualJointAngle3 = 1;
-    msg.actualJointAngle4 = 0;
-    msg.actualJointAngle5 = 13;
-    msg.actualJointAngle6 = 14;
+    msg.status = m_newData.movementStarted;
+    msg.mode = 0;
+    msg.gripperStatate= 0;
+    msg.targetCoordinate_target_x = cartesianPosition.target_x;
+    msg.targetCoordinate_target_y = cartesianPosition.target_y;
+    msg.targetCoordinate_target_z = cartesianPosition.target_z;
+    msg.targetCoordinate_target_roll = cartesianPosition.target_roll;
+    msg.targetCoordinate_target_pitch = cartesianPosition.target_pitch;
+    msg.targetCoordinate_target_yaw = cartesianPosition.target_yaw;
+    msg.actualJointAngle1 = armCoreData.actualPositions.JointAngle1;
+    msg.actualJointAngle2 = armCoreData.actualPositions.JointAngle2;
+    msg.actualJointAngle3 = armCoreData.actualPositions.JointAngle3;
+    msg.actualJointAngle4 = armCoreData.actualPositions.JointAngle4;
+    msg.actualJointAngle5 = armCoreData.actualPositions.JointAngle5;
+    msg.actualJointAngle6 = armCoreData.actualPositions.JointAngle6;
 
     pub.publish(msg);
 }

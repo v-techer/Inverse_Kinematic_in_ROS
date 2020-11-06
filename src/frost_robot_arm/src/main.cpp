@@ -316,7 +316,7 @@ int main(int argc, char** argv)
 
     sys.sendDataToArmCore();
 
-    gnd.sendDataToGroundstation();
+    gnd.sendDataToGroundstation(sys.getArmCoreData(), sys.getCartesianPosition());
 
   }
 

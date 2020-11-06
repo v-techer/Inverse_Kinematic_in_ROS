@@ -268,9 +268,8 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     // inforamtion for further excuting of positions.
     target = move_group->getCurrentPose();
 
-    // take care and use the setEulerZYX. This calcualates the absoulte positin of the endeffector.
-    // with the setRPY it always cals arelative movement!
-    orientation.setEuler( deg2rad(transformationVector.target_roll), deg2rad(transformationVector.target_pitch), deg2rad(transformationVector.target_yaw) );
+    // This calcualates the absoulte positin of the endeffector in rall pitch yaw.
+    orientation.setRPY( deg2rad(transformationVector.target_roll), deg2rad(transformationVector.target_pitch), deg2rad(transformationVector.target_yaw));
 
     orientation.normalize();
 
@@ -354,6 +353,29 @@ void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teached
         ROS_INFO("position is out of range!");
     }
 }
+
+
+globalData_typeDef_robotArm_MOTOR_ARM System::getArmCoreData()
+{
+    return m_newReceivedData;
+}
+
+globalData_typeDef_robotArm_posTransformation System::getCartesianPosition()
+{
+    geometry_msgs::PoseStamped test1 = move_group->getCurrentPose();
+    std::vector<double> test2 = move_group->getCurrentRPY();
+    globalData_typeDef_robotArm_posTransformation currentPosition;
+
+    currentPosition.target_roll = rad2deg(test2.at(0));
+    currentPosition.target_pitch = rad2deg(test2.at(1));
+    currentPosition.target_yaw = rad2deg(test2.at(2));
+    currentPosition.target_x = test1.pose.position.x * 1000;
+    currentPosition.target_y = test1.pose.position.y * 1000;
+    currentPosition.target_z = test1.pose.position.z * 1000;
+
+    return currentPosition;
+}
+
 
 /*************************** end public functions *****************************
  */
