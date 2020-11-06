@@ -7,6 +7,9 @@
   <material name="blue">
     <color rgba="0 0 0.8 0.7"/>
   </material>
+  <material name="red">
+    <color rgba="0.8 0 0 1"/>
+  </material>
   <!--xacro:macro name="cube_inertial" params="width height depth mass *origin">
     <inertial>
       <mass value="${mass}" />
@@ -16,6 +19,7 @@
         izz="${0.0833333 * mass * (width * width + height * height)}" />
     </inertial>
   </xacro:macro-->
+  <link name="world"/>
   <!--xacro:unless value="${not connected_to}">
     <joint name="${arm_id}_joint_${connected_to}" type="fixed">
       <parent link="${connected_to}"/>
@@ -23,6 +27,11 @@
       <origin rpy="${rpy}" xyz="${xyz}"/>
     </joint>
   </xacro:unless-->
+  <joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="link_base"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+  </joint>
   <link name="link_base">
     <visual>
       <geometry>

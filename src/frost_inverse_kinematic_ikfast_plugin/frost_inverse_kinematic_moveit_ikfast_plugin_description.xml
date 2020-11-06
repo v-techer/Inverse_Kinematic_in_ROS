@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library path="lib/libfrost_inverse_kinematic_moveit_ikfast_plugin">
+  <class base_class_type="kinematics::KinematicsBase" name="frost_inverse_kinematic/IKFastKinematicsPlugin" type="frost_inverse_kinematic::IKFastKinematicsPlugin">
+    <description>IKFast61 plugin for closed-form kinematics of frost inverse_kinematic</description>
+  </class>
+</library>
