@@ -226,6 +226,8 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
     // add the actueal orientation with the relatively movement.
     orientation.operator*=(rotation);
     
+    //The magnitude of a quaternion should be one. If numerical errors cause a
+    //quaternion magnitude other than one, ROS will print warnings. To avoid these warnings, normalize the quaternion
     orientation.normalize();
 
     // change the target orientation with new calculated one
@@ -269,8 +271,10 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     target = move_group->getCurrentPose();
 
     // This calcualates the absoulte positin of the endeffector in rall pitch yaw.
-    orientation.setRPY( deg2rad(transformationVector.target_roll), deg2rad(transformationVector.target_pitch), deg2rad(transformationVector.target_yaw));
-
+    orientation.setRPY(deg2rad(transformationVector.target_roll), deg2rad(transformationVector.target_pitch), deg2rad(transformationVector.target_yaw));
+    
+    //The magnitude of a quaternion should be one. If numerical errors cause a
+    //quaternion magnitude other than one, ROS will print warnings. To avoid these warnings, normalize the quaternion
     orientation.normalize();
 
     target.pose.orientation.x = orientation.getX();
@@ -362,18 +366,18 @@ globalData_typeDef_robotArm_MOTOR_ARM System::getArmCoreData()
 
 globalData_typeDef_robotArm_posTransformation System::getCartesianPosition()
 {
-    geometry_msgs::PoseStamped test1 = move_group->getCurrentPose();
-    std::vector<double> test2 = move_group->getCurrentRPY();
-    globalData_typeDef_robotArm_posTransformation currentPosition;
+    geometry_msgs::PoseStamped currentPosition = move_group->getCurrentPose();
+    std::vector<double> currentOrientation = move_group->getCurrentRPY();
+    globalData_typeDef_robotArm_posTransformation currentPose;
+ 
+    currentPose.target_roll = rad2deg(currentOrientation.at(0));    //roll
+    currentPose.target_pitch = rad2deg(currentOrientation.at(1));   //pitch
+    currentPose.target_yaw = rad2deg(currentOrientation.at(2));     //yaw
+    currentPose.target_x = currentPosition.pose.position.x * 1000;
+    currentPose.target_y = currentPosition.pose.position.y * 1000;
+    currentPose.target_z = currentPosition.pose.position.z * 1000;
 
-    currentPosition.target_roll = rad2deg(test2.at(0));
-    currentPosition.target_pitch = rad2deg(test2.at(1));
-    currentPosition.target_yaw = rad2deg(test2.at(2));
-    currentPosition.target_x = test1.pose.position.x * 1000;
-    currentPosition.target_y = test1.pose.position.y * 1000;
-    currentPosition.target_z = test1.pose.position.z * 1000;
-
-    return currentPosition;
+    return currentPose;
 }
 
 
