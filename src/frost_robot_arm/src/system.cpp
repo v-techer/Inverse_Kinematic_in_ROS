@@ -226,6 +226,8 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
     // add the actueal orientation with the relatively movement.
     orientation.operator*=(rotation);
     
+    //The magnitude of a quaternion should be one. If numerical errors cause a
+    //quaternion magnitude other than one, ROS will print warnings. To avoid these warnings, normalize the quaternion
     orientation.normalize();
 
     // change the target orientation with new calculated one
