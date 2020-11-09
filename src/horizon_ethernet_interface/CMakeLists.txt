@@ -53,6 +53,7 @@ add_message_files(
   BoschSensorMessage.msg  
   ArmCoreToRobotarm.msg
   GroundstationToRobotarm.msg
+  RobotarmToGroundstation.msg
 )
 
 ## Generate services in the 'srv' folder

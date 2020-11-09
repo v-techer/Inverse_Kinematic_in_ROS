@@ -65,7 +65,7 @@ find_package(Boost REQUIRED system filesystem date_time thread)
 ## Generate messages in the 'msg' folder
  add_message_files(
    FILES
-   ArmCoreToRobotarm.msg
+   RobotarmToGroundstation.msg
    ArmCoreToSystem.msg
    GroundstationToRobotarm.msg
    SystemToArmCore.msg
