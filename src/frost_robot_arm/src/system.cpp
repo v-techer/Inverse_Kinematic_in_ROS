@@ -197,6 +197,7 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
     tf2::Quaternion rotation;
     tf2::Quaternion orientation;
     tf2::Quaternion newOrientation;
+    globalData_typeDef_robotArmVelocity velocity;
 
     // normailze the the values that get send for the orientation scale it down to 20 percont of input value
     const double scale = 20;
@@ -243,6 +244,13 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
 
     // calculate out of the waypoints the trajectory and store it in m_myPlan.trajectory
     move_group->computeCartesianPath(waypoints, eef_step, jump_threshold, m_myPlan.trajectory_);
+
+    velocity.JointVelocity1 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(0);
+    velocity.JointVelocity2 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(1);
+    velocity.JointVelocity3 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(2);
+    velocity.JointVelocity4 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(3);
+    velocity.JointVelocity5 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(4);
+    velocity.JointVelocity6 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(5);
 
     visual_tools->deleteAllMarkers();
     // visual_tools->publishPath(waypoints, rvt::LIME_GREEN, rvt::SMALL);
