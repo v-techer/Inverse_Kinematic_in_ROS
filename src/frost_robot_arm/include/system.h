@@ -24,7 +24,7 @@ class System
 private:
     void receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPtr& msg);
     double rad2deg(double rad);
-    double deg2rad(int16_t degree);
+    double deg2rad(double degree);
     double calcVelocity(int16_t velocityPercentig);
     void init();
 
@@ -56,6 +56,8 @@ public:
     void calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teachedPos, bool collisionDetection);
     void calcNewTrajectory(globalData_typeDef_robotArm_posTransformation transformationVector, bool collisionDetection);
     globalData_typeDef_robotArmVelocity calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector);
+    globalData_typeDef_robotArm_MOTOR_ARM getArmCoreData();
+    globalData_typeDef_robotArm_posTransformation getCartesianPosition();
     void incrementTrajectoryIterator();
     bool isTrajectoryPointReached();
     bool furtherTrajectoriePoints();

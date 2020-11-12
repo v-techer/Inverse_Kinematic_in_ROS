@@ -264,6 +264,12 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     // with the setRPY it always cals arelative movement!
     orientation.setEuler( deg2rad(transformationVector.target_roll), deg2rad(transformationVector.target_pitch), deg2rad(transformationVector.target_yaw) );
 
+    // Roll Pitch and Yaw are rotation around the Roll = X-Axis, Pitch= Y-Axis and Yaw= Z-Axis.
+    // be aware it is always a rotation seen from the world origin of coordinate
+    orientation.setRPY(deg2rad(transformationVector.target_roll), deg2rad(transformationVector.target_pitch), deg2rad(transformationVector.target_yaw));
+
+    //The magnitude of a quaternion should be one. If numerical errors cause a
+    //quaternion magnitude other than one, ROS will print warnings. To avoid these warnings, normalize the quaternion
     orientation.normalize();
 
     target.pose.orientation.x = orientation.getX();
@@ -293,7 +299,6 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
         visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
         visual_tools->trigger();     
     }
-    // TODO add a return value with info about calculation. For example moveitErrorCode
 }    
 
 void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teachedPos, bool collisionDetection)
@@ -346,6 +351,37 @@ void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teached
     }
 }
 
+
+globalData_typeDef_robotArm_MOTOR_ARM System::getArmCoreData()
+{
+    return m_newReceivedData;
+}
+
+globalData_typeDef_robotArm_posTransformation System::getCartesianPosition()
+{
+    geometry_msgs::PoseStamped currentPosition = move_group->getCurrentPose();
+    std::vector<double> currentOrientation = move_group->getCurrentRPY();
+    globalData_typeDef_robotArm_posTransformation currentPose;
+    double array[6];
+    
+    array[0] = currentPosition.pose.position.x * 1000;
+    array[1] = currentPosition.pose.position.y * 1000;
+    array[2] = currentPosition.pose.position.z * 1000;
+    array[3] = rad2deg(currentOrientation.at(0));    //roll
+    array[4] = rad2deg(currentOrientation.at(1));   //pitch
+    array[5] = rad2deg(currentOrientation.at(2));     //yaw
+
+    currentPose.target_x = currentPosition.pose.position.x * 1000;
+    currentPose.target_y = currentPosition.pose.position.y * 1000;
+    currentPose.target_z = currentPosition.pose.position.z * 1000;
+    currentPose.target_roll = rad2deg(currentOrientation.at(0));    //roll
+    currentPose.target_pitch = rad2deg(currentOrientation.at(1));   //pitch
+    currentPose.target_yaw = rad2deg(currentOrientation.at(2));     //yaw
+
+    return currentPose;
+}
+
+
 /*************************** end public functions *****************************
  */
 
@@ -359,7 +395,7 @@ double System::rad2deg(double radian)
     return deg;
 }
 
-double System::deg2rad(int16_t degree)
+double System::deg2rad(double degree)
 {
     double rad = ((double) degree) * pi/180.0;
 

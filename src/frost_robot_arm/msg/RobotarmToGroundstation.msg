@@ -1,0 +1,16 @@
+uint8 dataID
+uint8 status
+uint8 mode
+uint8 gripperStatate
+int16 targetCoordinate_target_x
+int16 targetCoordinate_target_y
+int16 targetCoordinate_target_z
+int16 targetCoordinate_target_roll
+int16 targetCoordinate_target_pitch
+int16 targetCoordinate_target_yaw
+int16 actualJointAngle1
+int16 actualJointAngle2
+int16 actualJointAngle3
+int16 actualJointAngle4
+int16 actualJointAngle5
+int16 actualJointAngle6
