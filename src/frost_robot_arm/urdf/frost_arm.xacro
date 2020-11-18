@@ -97,12 +97,14 @@
     <origin rpy="0 0 0" xyz="0 0 0.01"/>
     <parent link="link_base"/>
     <child link="link_0"/>
-    <!-- effort is for revolut joints in Nm for translatoric joints N
+    <!-- effort is for revolut joints in Nm for translatoric joints N and the velocity is in rad/s
     the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
     <!-- this values for effort and velocity are entert without reference. This are only assumptipons-->
     <!-- the planet gear has a ratio of 15,3:1 multipled with the realtion of the cogwheel of the 54 teeth and 24 teeth
      it multiples up to 15.3 * 54/24 = 34.425. This creates a ration of 34.425:1-->
-    <!-- form datasheet permited repeatable peak torque 176Nm-->
+    <!-- The actuator what we are using is the steppermotor 23HS22-2804S-PG15 with a maximum rotation per minit of 400 n/min
+    and a maximum Moment of 0,916 Nm-->
+    <!-- also a two gears a used with a ratio of 54 to 24 thats a ratio of 2,25-->
     <!-- with a ratio of 34.425 and a maximal motor speed of 2000 rad/min, we get a maximal output speed of 58 rad/min-->
     <limit effort="31" lower="-3.141592654" upper="3.141592654" velocity="58"/>
   </joint>
@@ -137,12 +139,14 @@
     <parent link="link_0"/>
     <child link="link_1"/>
     <origin rpy="0 0 0" xyz="0 0 0.1"/>
-    <!-- effort is for revolut joints in Nm for translatoric joints N
+    <!-- effort is for revolut joints in Nm for translatoric joints N and the velocity is in rad/s
     the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
     <!-- effort for the harmonic drive is given in Nm and velocity in rotation per minit-->
     <!--effort specification for the HFUC-25-160-2UH: https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019644_HFUC_2UH.pdf -->
     <!-- form datasheet permited repeatable peak torque 176Nm-->
-    <!-- with a ratio of 160 and a maximal motor speed of XXX rad/min, we get a maximal output speed of XXX rad/min-->
+    <!-- The actuator what we are using is the steppermotor ST8918S4508-A with a maximum rotation per minit of 150 n/min
+    and a maximum Moment of 2,95 Nm-->
+    <!-- with a ratio of 160 and a maximal motor speed of 150 rad/min, we get a maximal output speed of 0,0156 rad/min-->
     <limit effort="472" lower="-1.570796327" upper="1.570796327" velocity="41"/>
   </joint>
 
@@ -175,12 +179,14 @@
     <parent link="link_1"/>
     <child link="link_2"/>
     <origin rpy="0 0 0" xyz="0 0 0.43"/>
-    <!-- effort is for revolut joints in Nm for translatoric joints N
+    <!-- effort is for revolut joints in Nm for translatoric joints N and the velocity is in rad/s
     the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
     <!-- effort for the harmonic drive is given in Nm and velocity in rotation per minit-->
     <!--effort specification for the CSG-17-120-2UH: https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019642_CSG_2UH.pdf -->
     <!-- form datasheet permited repeatable peak torque 176Nm-->
-    <!-- with a ratio of 120 and a maximal motor speed of XXX rad/min, we get a maximal output speed of XXX rad/min-->
+    <!-- The actuator what we are using is the steppermotor ST6018X3008-A with a maximum rotation per minit of 400 n/min
+    and a maximum Moment of 0,916 Nm-->
+    <!-- with a ratio of 120 and a maximal motor speed of 400 rad/min, we get a maximal output speed of 0,075 rad/s-->
     <limit effort="109" lower="-2.268928027593" upper="2.617993877991" velocity="72"/>
   </joint>
 
@@ -214,13 +220,15 @@
     <parent link="link_2"/>
     <child link="link_3"/>
     <origin rpy="0 0 0" xyz="0.0 0.0 0.21"/>
-    <!-- effort is for revolut joints in Nm for translatoric joints N
+    <!-- effort is for revolut joints in Nm for translatoric joints N and the velocity is in rad/s
     the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
     <!-- effort for the harmonic drive is given in Nm and velocity in rotation per minit-->
     <!--effort specification for the CSF-14-100-2XH : https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019649_CSF_Mini.pdf -->
     <!-- form datasheet permited repeatable peak torque 28Nm-->
-    <!-- with a ratio of 100 and a maximal motor speed of XXX rad/min, we get a maximal output speed of XXX rad/min-->
-    <limit effort="91" lower="-2.705260340591" upper="2.705260340591" velocity="60"/>
+    <!-- The actuator what we are using is the steppermotor ST4118L3004-B with a maximum rotation per minit of 450 n/min
+    and a maximum Moment of 0,531 Nm-->
+    <!-- with a ratio of 100 and a maximal motor speed of 450 rad/min, we get a maximal output speed of 0,0555 rad/s-->
+    <limit effort="53" lower="-2.705260340591" upper="2.705260340591" velocity="60"/>
   </joint>
 
 
@@ -254,11 +262,13 @@
     <parent link="link_3"/>
     <child link="link_4"/>
     <origin rpy="0 0 0" xyz="0 0.0 0.21"/>
-    <!-- effort is for revolut joints in Nm for translatoric joints N
+    <!-- effort is for revolut joints in Nm for translatoric joints N and the velocity is in rad/s
     the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
     <!-- effort for the harmonic drive is given in Nm and velocity in rotation per minit -->
     <!--effort specification for the CSG-17-120-2UH: https://harmonicdrive.de/fileadmin/user_upload/2014_12_ED_1019642_CSG_2UH.pdf --> 
     <!-- form datasheet permited repeatable peak torque 70Nm-->
+    <!-- The actuator what we are using is the steppermotor ST6018X3008-A with a maximum rotation per minit of 400 n/min
+    and a maximum Moment of 0,916 Nm-->
     <!-- with a ratio of 120 and a maximal motor speed of XXX rad/min, we get a maximal output speed of XXX rad/min-->
     <limit effort="109" lower="-1.570796326795" upper="1.570796326795" velocity="113"/>
   </joint>
@@ -293,9 +303,11 @@
     <parent link="link_4"/>
     <child link="link_5"/>
     <origin rpy="0 0 0" xyz="0 0 0.125"/>
-    <!-- effort is for revolut joints in Nm for translatoric joints N
+    <!-- effort is for revolut joints in Nm for translatoric joints N and the velocity is in rad/s
     the source to this fact:https://wiki.ros.org/pr2_controller_manager/safety_limits -->
     <!-- this values for effort and velocity are entert without reference. This are only assumptipons-->
+    <!-- The actuator what we are using is the steppermotor ST6018X3008-A with a maximum rotation per minit of 400 n/min
+    and a maximum Moment of 0,916 Nm-->
     <limit effort="2" lower="-3.14159265359" upper="3.14159265359" velocity="10"/>
   </joint>
 </robot>
