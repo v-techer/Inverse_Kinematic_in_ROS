@@ -296,6 +296,8 @@ int main(int argc, char** argv)
 
     sys.sendDataToArmCore();
 
+    gnd.sendDataToGroundstation(sys.getArmCoreData(), sys.getCartesianPosition());
+
   }
 
   ros::shutdown();
