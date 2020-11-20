@@ -483,7 +483,8 @@ typedef struct
     globalData_typeDef_robotArmVelocity targetVelocities;
     globalData_typeDef_robotArmAcceleration targetAcceleration;
     uint8_t PositionReached[6];
-	uint8_t dummy[2];
+	uint8_t RobotArmPositionReached;
+	uint8_t dummy[1];
 }globalData_typeDef_robotArm_MOTOR_ARM;    // CM --> DK
 
 typedef struct

@@ -589,8 +589,8 @@ class ArmCore(DataClass):
 												"reachedJointPosition4" : 43,
 												"reachedJointPosition5" : 44,
 												"reachedJointPosition6" : 45,
-												"dummy1":46,
-												"dummy2":47}
+												"robotArmPositionReached" :46,
+												"dummy1":47}
 		self.RobotArm_ARM_CORE_TO_ARM = [	self.RobotArm_ARM_CORE_TO_ARM_list,
 											self.RobotArm_ARM_CORE_TO_ARM_types,
 											self.RobotArm_ARM_CORE_TO_ARM_keys]
@@ -669,7 +669,8 @@ class ArmCore(DataClass):
 			msg.PositionReached = [ self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition1'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition2'), 'RX'),
 									self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition3'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition4'), 'RX'),
 									self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition5'), 'RX'), self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'reachedJointPosition6'), 'RX')]
-			msg.dummy = [0, 0]
+			msg.RobotArmPositionReached = self.getValueByIndex(self.getIndexByKey(rx_id, 'RX', 'robotArmPositionReached'), 'RX')
+			msg.dummy = [0]
 			
 			#rospy.loginfo(msg)
 			

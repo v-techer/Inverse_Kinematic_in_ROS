@@ -103,6 +103,20 @@ void System::init()
     m_transmitData.targetAcceleration.JointAcceleration4 = 0;
     m_transmitData.targetAcceleration.JointAcceleration5 = 0;
     m_transmitData.targetAcceleration.JointAcceleration6 = 0;
+    m_newReceivedData.RobotArmPositionReached = 0;
+    m_oldReceivedData.RobotArmPositionReached = 1;
+    m_newReceivedData.PositionReached[0] = 0;
+    m_newReceivedData.PositionReached[1] = 0;
+    m_newReceivedData.PositionReached[2] = 0;
+    m_newReceivedData.PositionReached[3] = 0;
+    m_newReceivedData.PositionReached[4] = 0;
+    m_newReceivedData.PositionReached[5] = 0;
+    m_oldReceivedData.PositionReached[0] = 1;
+    m_oldReceivedData.PositionReached[1] = 1;
+    m_oldReceivedData.PositionReached[2] = 1;
+    m_oldReceivedData.PositionReached[3] = 1;
+    m_oldReceivedData.PositionReached[4] = 1;
+    m_oldReceivedData.PositionReached[5] = 1;
 }
 
 /***************************** getter functions *******************************
@@ -529,24 +543,34 @@ void System::receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPt
     m_newReceivedData.PositionReached[3] = msg->PositionReached[3];
     m_newReceivedData.PositionReached[4] = msg->PositionReached[4];
     m_newReceivedData.PositionReached[5] = msg->PositionReached[5];
+    m_newReceivedData.RobotArmPositionReached = msg->RobotArmPositionReached;
     m_newReceivedData.dummy[0] = msg->dummy[0];
-    m_newReceivedData.dummy[1] = msg->dummy[1];
+
 
     // check if positionReached got deprecated
-    if (m_newReceivedData.PositionReached[0] && m_newReceivedData.PositionReached[1] && m_newReceivedData.PositionReached[2] &&
-        m_newReceivedData.PositionReached[3] && m_newReceivedData.PositionReached[4] && m_newReceivedData.PositionReached[5])
+    if (m_newReceivedData.RobotArmPositionReached)
     {
-        for (int i = 0; i < 6; i++)
-        {
-            if (m_newReceivedData.PositionReached[i] != m_oldReceivedData.PositionReached[i])
-            {
-                m_trajectoryPointReached = true;
-                break;
-            }
-        }
-        // if (!std::equal(std::begin(m_newReceivedData.PositionReached), std::end(m_newReceivedData.PositionReached), std::begin(m_oldReceivedData.PositionReached)))
-        //     m_trajectoryPointReached = true;
+        if (m_newReceivedData.RobotArmPositionReached != m_oldReceivedData.RobotArmPositionReached)
+            m_trajectoryPointReached = true;
     }
+    // // check if positionReached got deprecated
+    // if (m_newReceivedData.PositionReached[0] && m_newReceivedData.PositionReached[1] && m_newReceivedData.PositionReached[2] &&
+    //     m_newReceivedData.PositionReached[3] && m_newReceivedData.PositionReached[4] && m_newReceivedData.PositionReached[5])
+    // {
+
+    //     m_trajectoryPointReached = false;
+
+    //     for (int i = 0; i < 6; i++)
+    //     {
+    //         if (m_newReceivedData.PositionReached[i] != m_oldReceivedData.PositionReached[i])
+    //         {
+    //             m_trajectoryPointReached = true;
+    //             break;
+    //         }
+    //     }
+    //     // if (!std::equal(std::begin(m_newReceivedData.PositionReached), std::end(m_newReceivedData.PositionReached), std::begin(m_oldReceivedData.PositionReached)))
+    //     //     m_trajectoryPointReached = true;
+    // }
 }
 
 /************************** end transmitter receiver **************************

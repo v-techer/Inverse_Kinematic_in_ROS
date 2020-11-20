@@ -6,6 +6,7 @@
   </node>
 
 <!-- if the real arm is not connected dont publish encoder values-->
-  <node name="encoder_state_publisher" pkg="frost_robot_arm" type="encoder_state_publisher" if="$(eval real_arm == false)"> </node>
+  <node name="encoder_state_publisher" pkg="frost_robot_arm" type="encoder_state_publisher"  if="$(eval real_arm == true)">
+  </node>
 
 </launch>

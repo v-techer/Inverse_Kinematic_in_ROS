@@ -9,4 +9,5 @@ int32[6] targetPositions
 int32[6] targetVelocities
 int32[6] targetAcceleration
 uint8[6] PositionReached
-uint8[2] dummy
+uint8 RobotArmPositionReached
+uint8[1] dummy
