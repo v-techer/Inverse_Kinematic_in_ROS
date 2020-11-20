@@ -76,6 +76,27 @@ void System::init()
         move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
     visual_tools = new moveit_visual_tools::MoveItVisualTools("world");
+
+    m_trajectoryIterator = 0;
+
+    m_transmitData.targetPositions.JointAngle1 = 0;
+    m_transmitData.targetPositions.JointAngle2 = 0;
+    m_transmitData.targetPositions.JointAngle3 = 0;
+    m_transmitData.targetPositions.JointAngle4 = 0;
+    m_transmitData.targetPositions.JointAngle5 = 0;
+    m_transmitData.targetPositions.JointAngle6 = 0;
+    m_transmitData.targetVelocities.JointVelocity1 = 0;
+    m_transmitData.targetVelocities.JointVelocity2 = 0;
+    m_transmitData.targetVelocities.JointVelocity3 = 0;
+    m_transmitData.targetVelocities.JointVelocity4 = 0;
+    m_transmitData.targetVelocities.JointVelocity5 = 0;
+    m_transmitData.targetVelocities.JointVelocity6 = 0;
+    m_transmitData.targetAcceleration.JointAcceleration1 = 0;
+    m_transmitData.targetAcceleration.JointAcceleration2 = 0;
+    m_transmitData.targetAcceleration.JointAcceleration3 = 0;
+    m_transmitData.targetAcceleration.JointAcceleration4 = 0;
+    m_transmitData.targetAcceleration.JointAcceleration5 = 0;
+    m_transmitData.targetAcceleration.JointAcceleration6 = 0;
 }
 
 /***************************** getter functions *******************************
@@ -150,24 +171,24 @@ void System::setTargetTrajectoryPoint()
     {
         trajectory_point = m_myPlan.trajectory_.joint_trajectory.points.at(m_trajectoryIterator);
 
-        m_transmitData.targetPositions.JointAngle1 = 1000*rad2deg(trajectory_point.positions.at(0));
-        m_transmitData.targetPositions.JointAngle2 = 1000*rad2deg(trajectory_point.positions.at(1));
-        m_transmitData.targetPositions.JointAngle3 = 1000*rad2deg(trajectory_point.positions.at(2));
-        m_transmitData.targetPositions.JointAngle4 = 1000*rad2deg(trajectory_point.positions.at(3));
-        m_transmitData.targetPositions.JointAngle5 = 1000*rad2deg(trajectory_point.positions.at(4));
-        m_transmitData.targetPositions.JointAngle6 = 1000*rad2deg(trajectory_point.positions.at(5));
-        m_transmitData.targetVelocities.JointVelocity1 = 1000*rad2deg(trajectory_point.velocities.at(0));
-        m_transmitData.targetVelocities.JointVelocity2 = 1000*rad2deg(trajectory_point.velocities.at(1));
-        m_transmitData.targetVelocities.JointVelocity3 = 1000*rad2deg(trajectory_point.velocities.at(2));
-        m_transmitData.targetVelocities.JointVelocity4 = 1000*rad2deg(trajectory_point.velocities.at(3));
-        m_transmitData.targetVelocities.JointVelocity5 = 1000*rad2deg(trajectory_point.velocities.at(4));
-        m_transmitData.targetVelocities.JointVelocity6 = 1000*rad2deg(trajectory_point.velocities.at(5));
-        m_transmitData.targetAcceleration.JointAcceleration1 = 1000*rad2deg(trajectory_point.accelerations.at(0));
-        m_transmitData.targetAcceleration.JointAcceleration2 = 1000*rad2deg(trajectory_point.accelerations.at(1));
-        m_transmitData.targetAcceleration.JointAcceleration3 = 1000*rad2deg(trajectory_point.accelerations.at(2));
-        m_transmitData.targetAcceleration.JointAcceleration4 = 1000*rad2deg(trajectory_point.accelerations.at(3));
-        m_transmitData.targetAcceleration.JointAcceleration5 = 1000*rad2deg(trajectory_point.accelerations.at(4));
-        m_transmitData.targetAcceleration.JointAcceleration6 = 1000*rad2deg(trajectory_point.accelerations.at(5));
+        m_transmitData.targetPositions.JointAngle1 = 100*rad2deg(trajectory_point.positions.at(0));
+        m_transmitData.targetPositions.JointAngle2 = 100*rad2deg(trajectory_point.positions.at(1));
+        m_transmitData.targetPositions.JointAngle3 = 100*rad2deg(trajectory_point.positions.at(2));
+        m_transmitData.targetPositions.JointAngle4 = 100*rad2deg(trajectory_point.positions.at(3));
+        m_transmitData.targetPositions.JointAngle5 = 100*rad2deg(trajectory_point.positions.at(4));
+        m_transmitData.targetPositions.JointAngle6 = 100*rad2deg(trajectory_point.positions.at(5));
+        m_transmitData.targetVelocities.JointVelocity1 = 100*rad2deg(trajectory_point.velocities.at(0));
+        m_transmitData.targetVelocities.JointVelocity2 = 100*rad2deg(trajectory_point.velocities.at(1));
+        m_transmitData.targetVelocities.JointVelocity3 = 100*rad2deg(trajectory_point.velocities.at(2));
+        m_transmitData.targetVelocities.JointVelocity4 = 100*rad2deg(trajectory_point.velocities.at(3));
+        m_transmitData.targetVelocities.JointVelocity5 = 100*rad2deg(trajectory_point.velocities.at(4));
+        m_transmitData.targetVelocities.JointVelocity6 = 100*rad2deg(trajectory_point.velocities.at(5));
+        m_transmitData.targetAcceleration.JointAcceleration1 = 100*rad2deg(trajectory_point.accelerations.at(0));
+        m_transmitData.targetAcceleration.JointAcceleration2 = 100*rad2deg(trajectory_point.accelerations.at(1));
+        m_transmitData.targetAcceleration.JointAcceleration3 = 100*rad2deg(trajectory_point.accelerations.at(2));
+        m_transmitData.targetAcceleration.JointAcceleration4 = 100*rad2deg(trajectory_point.accelerations.at(3));
+        m_transmitData.targetAcceleration.JointAcceleration5 = 100*rad2deg(trajectory_point.accelerations.at(4));
+        m_transmitData.targetAcceleration.JointAcceleration6 = 100*rad2deg(trajectory_point.accelerations.at(5));
     }
 }
 
@@ -236,9 +257,9 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
     endTarget.orientation.w = orientation.getW();
 
     // add the new offeset to the catual position
-    endTarget.position.x = endTarget.position.x + ((double) transformationVector.target_x/1000);
-    endTarget.position.y = endTarget.position.y + ((double) transformationVector.target_y/1000);
-    endTarget.position.z = endTarget.position.z + ((double) transformationVector.target_z/1000);
+    endTarget.position.x = endTarget.position.x + ((double) transformationVector.target_x/100);
+    endTarget.position.y = endTarget.position.y + ((double) transformationVector.target_y/100);
+    endTarget.position.z = endTarget.position.z + ((double) transformationVector.target_z/100);
 
     waypoints.push_back(endTarget);
 
@@ -289,9 +310,9 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     target.pose.orientation.z = orientation.getZ();
     target.pose.orientation.w = orientation.getW();
 
-    target.pose.position.x = ((double) transformationVector.target_x/1000);
-    target.pose.position.y = ((double) transformationVector.target_y/1000);
-    target.pose.position.z = ((double) transformationVector.target_z/1000);
+    target.pose.position.x = ((double) transformationVector.target_x/100);
+    target.pose.position.y = ((double) transformationVector.target_y/100);
+    target.pose.position.z = ((double) transformationVector.target_z/100);
 
     move_group->setPoseTarget(target);
 
@@ -380,9 +401,9 @@ globalData_typeDef_robotArm_posTransformation System::getCartesianPosition()
     currentPose.target_roll = rad2deg(currentOrientation.at(0));    //roll
     currentPose.target_pitch = rad2deg(currentOrientation.at(1));   //pitch
     currentPose.target_yaw = rad2deg(currentOrientation.at(2));     //yaw
-    currentPose.target_x = currentPosition.pose.position.x * 1000;
-    currentPose.target_y = currentPosition.pose.position.y * 1000;
-    currentPose.target_z = currentPosition.pose.position.z * 1000;
+    currentPose.target_x = currentPosition.pose.position.x * 100;
+    currentPose.target_y = currentPosition.pose.position.y * 100;
+    currentPose.target_z = currentPosition.pose.position.z * 100;
 
     return currentPose;
 }
@@ -509,8 +530,16 @@ void System::receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPt
     if (m_newReceivedData.PositionReached[0] && m_newReceivedData.PositionReached[1] && m_newReceivedData.PositionReached[2] &&
         m_newReceivedData.PositionReached[3] && m_newReceivedData.PositionReached[4] && m_newReceivedData.PositionReached[5])
     {
-        if (!std::equal(std::begin(m_newReceivedData.PositionReached), std::end(m_newReceivedData.PositionReached), std::begin(m_oldReceivedData.PositionReached)))
-            m_trajectoryPointReached = true;
+        for (int i = 0; i < 6; i++)
+        {
+            if (m_newReceivedData.PositionReached[i] != m_oldReceivedData.PositionReached[i])
+            {
+                m_trajectoryPointReached = true;
+                break;
+            }
+        }
+        // if (!std::equal(std::begin(m_newReceivedData.PositionReached), std::end(m_newReceivedData.PositionReached), std::begin(m_oldReceivedData.PositionReached)))
+        //     m_trajectoryPointReached = true;
     }
 }
 

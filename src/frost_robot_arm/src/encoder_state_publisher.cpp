@@ -12,7 +12,7 @@ sensor_msgs::JointState joint_state;
 double rad2deg(double radian);
 double deg2rad(int16_t degree);
 void initJointState();
-void encoderValuesReceiver_callBack(const frost_robot_arm::ArmCoreToSystem::ConstPtr & msg);
+void encoderValuesReceiver_callBack(const frost_robot_arm::ArmCoreToSystem::ConstPtr& msg);
 
 
 int main(int argc, char** argv)
@@ -24,10 +24,14 @@ int main(int argc, char** argv)
 
     initJointState();
 
-    joint_sub = n.subscribe("arm_core_to_ik_solver", 1, encoderValuesReceiver_callBack);
+    joint_sub = n.subscribe("arm_core_to_ik_solver", 1000, encoderValuesReceiver_callBack);
     joint_pub = n.advertise<sensor_msgs::JointState>("move_group/encoder_values", 1);
 
     ros::Rate loop_rate(30);
+
+    //ros::spin();
+    ros::AsyncSpinner spinner(0);
+    spinner.start();
 
     while (ros::ok()) 
     {

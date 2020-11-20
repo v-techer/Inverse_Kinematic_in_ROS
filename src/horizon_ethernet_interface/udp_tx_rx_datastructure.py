@@ -11,6 +11,7 @@ import struct  # packing and unpacking byte objects in specified c types
 #Message related imports
 from horizon_ethernet_interface.msg import GroundstationToRobotarm
 from horizon_ethernet_interface.msg import ArmCoreToRobotarm
+from horizon_ethernet_interface.msg import RobotarmToArmCore
 from horizon_ethernet_interface.msg import RobotarmToGroundstation
 
 
@@ -375,6 +376,7 @@ class ArmCore(DataClass):
 		DataClass.__init__(self)
 
 		self.arm_core_to_ik_solver = rospy.Publisher('arm_core_to_ik_solver', ArmCoreToRobotarm, queue_size=1)
+		rospy.Subscriber('ik_solver_to_arm_core', RobotarmToArmCore, self.callbackSystemState)
 		self.RobotArm_ARM_TO_ARM_CORE_types = [	'B',
 												'B',
 												'B',
@@ -592,6 +594,32 @@ class ArmCore(DataClass):
 		self.RobotArm_ARM_CORE_TO_ARM = [	self.RobotArm_ARM_CORE_TO_ARM_list,
 											self.RobotArm_ARM_CORE_TO_ARM_types,
 											self.RobotArm_ARM_CORE_TO_ARM_keys]
+
+	def callbackSystemState(self, msg):
+		self.RobotArm_ARM_TO_ARM_CORE_list[1] = msg.operationEnable
+		self.RobotArm_ARM_TO_ARM_CORE_list[2] = msg.targetlArmCoreMode
+		self.RobotArm_ARM_TO_ARM_CORE_list[3] = msg.Endeffector_open
+		self.RobotArm_ARM_TO_ARM_CORE_list[4] = msg.targetPositions[0]
+		self.RobotArm_ARM_TO_ARM_CORE_list[5] = msg.targetPositions[1]
+		self.RobotArm_ARM_TO_ARM_CORE_list[6] = msg.targetPositions[2]
+		self.RobotArm_ARM_TO_ARM_CORE_list[7] = msg.targetPositions[3]
+		self.RobotArm_ARM_TO_ARM_CORE_list[8] = msg.targetPositions[4]
+		self.RobotArm_ARM_TO_ARM_CORE_list[9] = msg.targetPositions[5]
+		self.RobotArm_ARM_TO_ARM_CORE_list[10] = msg.targetVelocities[0]
+		self.RobotArm_ARM_TO_ARM_CORE_list[11] = msg.targetVelocities[1]
+		self.RobotArm_ARM_TO_ARM_CORE_list[12] = msg.targetVelocities[2]
+		self.RobotArm_ARM_TO_ARM_CORE_list[13] = msg.targetVelocities[3]
+		self.RobotArm_ARM_TO_ARM_CORE_list[14] = msg.targetVelocities[4]
+		self.RobotArm_ARM_TO_ARM_CORE_list[15] = msg.targetVelocities[5]
+		self.RobotArm_ARM_TO_ARM_CORE_list[16] = msg.targetAcceleration[0]
+		self.RobotArm_ARM_TO_ARM_CORE_list[17] = msg.targetAcceleration[1]
+		self.RobotArm_ARM_TO_ARM_CORE_list[18] = msg.targetAcceleration[2]
+		self.RobotArm_ARM_TO_ARM_CORE_list[19] = msg.targetAcceleration[3]
+		self.RobotArm_ARM_TO_ARM_CORE_list[20] = msg.targetAcceleration[4]
+		self.RobotArm_ARM_TO_ARM_CORE_list[21] = msg.targetAcceleration[5]
+
+		rospy.loginfo(msg)
+
 	def getAddress(self):
 		return self.address
 

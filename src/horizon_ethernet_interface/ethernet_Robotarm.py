@@ -159,13 +159,17 @@ def init():
 		transfer = TransferClass(printing=True)
 		transfer.run_receive_thread()
 
+		rospy.loginfo("arm core participant added")
 		transfer.add_participant(participant.ArmCore())
+
+		rospy.loginfo("groundstation participant added")
 		transfer.add_participant(participant.Groundstation())
 		
 		transfer.run_send_cyclic_thread(transfer.get_participant(participant.ArmCore), 0.2)
 		transfer.run_send_cyclic_thread(transfer.get_participant(participant.Groundstation), 0.5)
 		return True
 	except:
+		rospy.logerr("udp connection problem")
 		return False
 
 def main():
