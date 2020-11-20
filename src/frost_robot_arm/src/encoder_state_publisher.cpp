@@ -6,7 +6,13 @@
 #include <frost_robot_arm/ArmCoreToSystem.h>
 #include <vector>
 
+
+/*  set the correct resolution of the encoder with constant
+    this is used to convert double numbers with 2 digits after
+    the comma seperator*/
+const int encoder_resolution = 100;
 const double pi = 3.141592654;
+
 sensor_msgs::JointState joint_state;
 
 double rad2deg(double radian);
@@ -17,7 +23,7 @@ void encoderValuesReceiver_callBack(const frost_robot_arm::ArmCoreToSystem::Cons
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "state_publisher");
+    ros::init(argc, argv, "frost_arm");
     ros::NodeHandle n;
     ros::Subscriber joint_sub;
     ros::Publisher joint_pub;
@@ -25,7 +31,7 @@ int main(int argc, char** argv)
     initJointState();
 
     joint_sub = n.subscribe("arm_core_to_ik_solver", 1000, encoderValuesReceiver_callBack);
-    joint_pub = n.advertise<sensor_msgs::JointState>("move_group/encoder_values", 1);
+    joint_pub = n.advertise<sensor_msgs::JointState>("frost_arm/encoder_joint_states", 1);
 
     ros::Rate loop_rate(30);
 
@@ -88,17 +94,17 @@ void initJointState()
 
 void encoderValuesReceiver_callBack(const frost_robot_arm::ArmCoreToSystem::ConstPtr & msg)
 {
-    joint_state.position[0] = deg2rad(msg->actualPositions[0])/1000;
-    joint_state.position[1] = deg2rad(msg->actualPositions[1])/1000;
-    joint_state.position[2] = deg2rad(msg->actualPositions[2])/1000;
-    joint_state.position[3] = deg2rad(msg->actualPositions[3])/1000;
-    joint_state.position[4] = deg2rad(msg->actualPositions[4])/1000;
-    joint_state.position[5] = deg2rad(msg->actualPositions[5])/1000;
+    joint_state.position[0] =  deg2rad(msg->actualPositions[0])/encoder_resolution;
+    joint_state.position[1] =  deg2rad(msg->actualPositions[1])/encoder_resolution;
+    joint_state.position[2] =  deg2rad(msg->actualPositions[2])/encoder_resolution;
+    joint_state.position[3] =  deg2rad(msg->actualPositions[3])/encoder_resolution;
+    joint_state.position[4] =  deg2rad(msg->actualPositions[4])/encoder_resolution;
+    joint_state.position[5] =  deg2rad(msg->actualPositions[5])/encoder_resolution;
 
-    joint_state.velocity[0] = deg2rad(msg->actualVelocities[0])/1000;
-    joint_state.velocity[1] = deg2rad(msg->actualVelocities[1])/1000;
-    joint_state.velocity[2] = deg2rad(msg->actualVelocities[2])/1000;
-    joint_state.velocity[3] = deg2rad(msg->actualVelocities[3])/1000;
-    joint_state.velocity[4] = deg2rad(msg->actualVelocities[4])/1000;
-    joint_state.velocity[5] = deg2rad(msg->actualVelocities[5])/1000;
+    joint_state.velocity[0] =  deg2rad(msg->actualVelocities[0])/encoder_resolution;
+    joint_state.velocity[1] =  deg2rad(msg->actualVelocities[1])/encoder_resolution;
+    joint_state.velocity[2] =  deg2rad(msg->actualVelocities[2])/encoder_resolution;
+    joint_state.velocity[3] =  deg2rad(msg->actualVelocities[3])/encoder_resolution;
+    joint_state.velocity[4] =  deg2rad(msg->actualVelocities[4])/encoder_resolution;
+    joint_state.velocity[5] =  deg2rad(msg->actualVelocities[5])/encoder_resolution;
 }

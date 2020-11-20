@@ -35,7 +35,7 @@
   <!-- We do not have a robot connected, so publish fake joint states -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" if="$(eval real_arm == true)">
     <param name="use_gui" value="$(arg use_gui)"/>
-    <rosparam param="source_list">[move_group/encoder_values]</rosparam>
+    <rosparam param="source_list">[frost_arm/encoder_joint_states]</rosparam>
   </node>
 
   <!-- We do not have a robot connected, so publish fake joint states -->

@@ -27,6 +27,12 @@
 static const std::string PLANNING_GROUP = "frost_arm";
 
 #define MAX_VELOCITY 10.0000
+
+/*  set the correct resolution of the encoder with constant
+    this is used to convert double numbers with 2 digits after
+    the comma seperator*/
+const int encoder_resolution = 100;
+const int groundstation_resolution = 100;
 const double pi = 3.141592654;
 
 // Visualization
@@ -135,7 +141,7 @@ globalData_typeDef_robotArmVelocity System::setAxeVelocity(globalData_enumTypeDe
     {
         tempAxes[i] = 0;
         if ( i == axeIndex )
-            tempAxes[i] = rad2deg(calcVelocity(velocityPercentig)) * 1000;
+            tempAxes[i] = rad2deg(calcVelocity(velocityPercentig)) * encoder_resolution;
     }
 
     targetVelocity.JointVelocity1 = tempAxes[0];
@@ -171,24 +177,24 @@ void System::setTargetTrajectoryPoint()
     {
         trajectory_point = m_myPlan.trajectory_.joint_trajectory.points.at(m_trajectoryIterator);
 
-        m_transmitData.targetPositions.JointAngle1 = 100*rad2deg(trajectory_point.positions.at(0));
-        m_transmitData.targetPositions.JointAngle2 = 100*rad2deg(trajectory_point.positions.at(1));
-        m_transmitData.targetPositions.JointAngle3 = 100*rad2deg(trajectory_point.positions.at(2));
-        m_transmitData.targetPositions.JointAngle4 = 100*rad2deg(trajectory_point.positions.at(3));
-        m_transmitData.targetPositions.JointAngle5 = 100*rad2deg(trajectory_point.positions.at(4));
-        m_transmitData.targetPositions.JointAngle6 = 100*rad2deg(trajectory_point.positions.at(5));
-        m_transmitData.targetVelocities.JointVelocity1 = 100*rad2deg(trajectory_point.velocities.at(0));
-        m_transmitData.targetVelocities.JointVelocity2 = 100*rad2deg(trajectory_point.velocities.at(1));
-        m_transmitData.targetVelocities.JointVelocity3 = 100*rad2deg(trajectory_point.velocities.at(2));
-        m_transmitData.targetVelocities.JointVelocity4 = 100*rad2deg(trajectory_point.velocities.at(3));
-        m_transmitData.targetVelocities.JointVelocity5 = 100*rad2deg(trajectory_point.velocities.at(4));
-        m_transmitData.targetVelocities.JointVelocity6 = 100*rad2deg(trajectory_point.velocities.at(5));
-        m_transmitData.targetAcceleration.JointAcceleration1 = 100*rad2deg(trajectory_point.accelerations.at(0));
-        m_transmitData.targetAcceleration.JointAcceleration2 = 100*rad2deg(trajectory_point.accelerations.at(1));
-        m_transmitData.targetAcceleration.JointAcceleration3 = 100*rad2deg(trajectory_point.accelerations.at(2));
-        m_transmitData.targetAcceleration.JointAcceleration4 = 100*rad2deg(trajectory_point.accelerations.at(3));
-        m_transmitData.targetAcceleration.JointAcceleration5 = 100*rad2deg(trajectory_point.accelerations.at(4));
-        m_transmitData.targetAcceleration.JointAcceleration6 = 100*rad2deg(trajectory_point.accelerations.at(5));
+        m_transmitData.targetPositions.JointAngle1 = encoder_resolution*rad2deg(trajectory_point.positions.at(0));
+        m_transmitData.targetPositions.JointAngle2 = encoder_resolution*rad2deg(trajectory_point.positions.at(1));
+        m_transmitData.targetPositions.JointAngle3 = encoder_resolution*rad2deg(trajectory_point.positions.at(2));
+        m_transmitData.targetPositions.JointAngle4 = encoder_resolution*rad2deg(trajectory_point.positions.at(3));
+        m_transmitData.targetPositions.JointAngle5 = encoder_resolution*rad2deg(trajectory_point.positions.at(4));
+        m_transmitData.targetPositions.JointAngle6 = encoder_resolution*rad2deg(trajectory_point.positions.at(5));
+        m_transmitData.targetVelocities.JointVelocity1 = encoder_resolution*rad2deg(trajectory_point.velocities.at(0));
+        m_transmitData.targetVelocities.JointVelocity2 = encoder_resolution*rad2deg(trajectory_point.velocities.at(1));
+        m_transmitData.targetVelocities.JointVelocity3 = encoder_resolution*rad2deg(trajectory_point.velocities.at(2));
+        m_transmitData.targetVelocities.JointVelocity4 = encoder_resolution*rad2deg(trajectory_point.velocities.at(3));
+        m_transmitData.targetVelocities.JointVelocity5 = encoder_resolution*rad2deg(trajectory_point.velocities.at(4));
+        m_transmitData.targetVelocities.JointVelocity6 = encoder_resolution*rad2deg(trajectory_point.velocities.at(5));
+        m_transmitData.targetAcceleration.JointAcceleration1 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(0));
+        m_transmitData.targetAcceleration.JointAcceleration2 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(1));
+        m_transmitData.targetAcceleration.JointAcceleration3 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(2));
+        m_transmitData.targetAcceleration.JointAcceleration4 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(3));
+        m_transmitData.targetAcceleration.JointAcceleration5 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(4));
+        m_transmitData.targetAcceleration.JointAcceleration6 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(5));
     }
 }
 
