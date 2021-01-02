@@ -25,13 +25,12 @@ private:
     void receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPtr& msg);
     double rad2deg(double rad);
     double deg2rad(double degree);
-    double calcVelocity(int16_t velocityPercentig);
+    double calcVelocity(int16_t velocityPercentig, double maxvelocity);
     void init();
 
     globalData_typeDef_robotArm_MOTOR_ARM m_newReceivedData;
     globalData_typeDef_robotArm_MOTOR_ARM m_oldReceivedData;
     globalData_typeDef_robotArm_ARM_MOTOR m_transmitData;
-    bool m_positionReached;
     bool m_trajectoryPointReached;
     moveit::planning_interface::MoveGroupInterface* move_group;
     const robot_state::JointModelGroup* joint_model_group;
@@ -55,7 +54,7 @@ public:
     void setTargetVelocitiy(globalData_typeDef_robotArmVelocity targetVelocity);
     void calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teachedPos, bool collisionDetection);
     void calcNewTrajectory(globalData_typeDef_robotArm_posTransformation transformationVector, bool collisionDetection);
-    globalData_typeDef_robotArmVelocity calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector);
+    void calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector);
     globalData_typeDef_robotArm_MOTOR_ARM getArmCoreData();
     globalData_typeDef_robotArm_posTransformation getCartesianPosition();
     void incrementTrajectoryIterator();

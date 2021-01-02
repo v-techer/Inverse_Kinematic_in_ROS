@@ -11,7 +11,6 @@ private:
     void init();
     void resetData();
     int m_currentMode;
-    globalData_enumTypeDef_robotArmAxis m_currentAxe;
     globalData_typeDef_robotArm_GS_ARM m_newData;
     globalData_typeDef_robotArm_GS_ARM m_oldData;
     bool m_newPosition;

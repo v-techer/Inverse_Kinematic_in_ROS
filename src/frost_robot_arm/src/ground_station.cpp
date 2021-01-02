@@ -117,7 +117,7 @@ int Groundstation::getCurrentMode()
 
 globalData_enumTypeDef_robotArmAxis Groundstation::getAxe()
 {
-    return m_currentAxe;
+    return m_newData.activAxis;
 }
 
 int16_t Groundstation::getVelocitiyPercentig()

@@ -55,7 +55,8 @@
     {   
         if ((m_currentState == ST_STOPED))
         {
-            if (m_currentMode == ROBOTARMMODE_TEACHED_POS ||
+            if (m_currentMode == ROBOTARMMODE_JOY ||
+                m_currentMode == ROBOTARMMODE_TEACHED_POS ||
                 m_currentMode == ROBOTARMMODE_POSITION)
             {
                 enterStateReadyToRun();
@@ -78,8 +79,8 @@
         if (m_currentState == ST_RUNNING)
         {
             if (m_currentMode == ROBOTARMMODE_JOY ||
-            m_currentMode == ROBOTARMMODE_TEACHED_POS ||
-            m_currentMode == ROBOTARMMODE_POSITION)
+                m_currentMode == ROBOTARMMODE_TEACHED_POS ||
+                m_currentMode == ROBOTARMMODE_POSITION)
                 enterStateReadyToRun();
             else
                 enterStateStoped();

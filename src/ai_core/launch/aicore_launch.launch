@@ -1,0 +1,3 @@
+<launch>
+  <node name="eth_schnittstelle" pkg="ai_core" type="eth_schnittstelle.py" />
+</launch>

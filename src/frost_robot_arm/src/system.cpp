@@ -21,8 +21,6 @@
 #include "globalDataStructures.h"
 #include "system.h"
 
-// data to the robot arm core are transmittet as degres with a persition of 3 number of digits after the decimal point.
-// further more are the numbers represented in rotation per minits.
 
 static const std::string PLANNING_GROUP = "frost_arm";
 
@@ -31,8 +29,8 @@ static const std::string PLANNING_GROUP = "frost_arm";
 /*  set the correct resolution of the encoder with constant
     this is used to convert double numbers with 2 digits after
     the comma seperator*/
-const int encoder_resolution = 100;
-const int groundstation_resolution = 100;
+const int encoder_resolution_factor = 100;
+const int groundstation_resolution_factor = 1000;
 const double pi = 3.141592654;
 
 // Visualization
@@ -43,8 +41,7 @@ const double pi = 3.141592654;
 
 namespace rvt = rviz_visual_tools;
 
-System::System(int argc, char** argv):
-m_positionReached(false)
+System::System(int argc, char** argv)
 {
     // //init the ros node
     ros::init(argc, argv, "system");
@@ -154,9 +151,32 @@ globalData_typeDef_robotArmVelocity System::setAxeVelocity(globalData_enumTypeDe
     for (uint8_t i = 0; i < ROBOTARMAXIS_MAX_LOCAL_AXIS; i++)
     {
         tempAxes[i] = 0;
-        if ( i == axeIndex )
-            tempAxes[i] = rad2deg(calcVelocity(velocityPercentig)) * encoder_resolution;
     }
+
+    switch (axeIndex)
+    {
+    case 0:
+        //out of robot description file urdf called frost_arm.xacro
+        tempAxes[0] = rad2deg(calcVelocity(velocityPercentig, 1.048)) * encoder_resolution_factor;
+        break;
+    case 1:
+        tempAxes[1] = rad2deg(calcVelocity(velocityPercentig, 0.348)) * encoder_resolution_factor;
+        break;
+    case 2:
+        tempAxes[2] = rad2deg(calcVelocity(velocityPercentig, 0.522)) * encoder_resolution_factor;
+        break;
+    case 3:
+        tempAxes[3] = rad2deg(calcVelocity(velocityPercentig, 0.942)) * encoder_resolution_factor;
+        break;
+    case 4:
+        tempAxes[4] = rad2deg(calcVelocity(velocityPercentig, 1.256)) * encoder_resolution_factor;
+        break;
+    case 5:
+        tempAxes[5] = rad2deg(calcVelocity(velocityPercentig, 1.000)) * encoder_resolution_factor;
+        break;
+    default:
+        break;
+    }     
 
     targetVelocity.JointVelocity1 = tempAxes[0];
     targetVelocity.JointVelocity2 = tempAxes[1];
@@ -191,24 +211,24 @@ void System::setTargetTrajectoryPoint()
     {
         trajectory_point = m_myPlan.trajectory_.joint_trajectory.points.at(m_trajectoryIterator);
 
-        m_transmitData.targetPositions.JointAngle1 = encoder_resolution*rad2deg(trajectory_point.positions.at(0));
-        m_transmitData.targetPositions.JointAngle2 = encoder_resolution*rad2deg(trajectory_point.positions.at(1));
-        m_transmitData.targetPositions.JointAngle3 = encoder_resolution*rad2deg(trajectory_point.positions.at(2));
-        m_transmitData.targetPositions.JointAngle4 = encoder_resolution*rad2deg(trajectory_point.positions.at(3));
-        m_transmitData.targetPositions.JointAngle5 = encoder_resolution*rad2deg(trajectory_point.positions.at(4));
-        m_transmitData.targetPositions.JointAngle6 = encoder_resolution*rad2deg(trajectory_point.positions.at(5));
-        m_transmitData.targetVelocities.JointVelocity1 = encoder_resolution*rad2deg(trajectory_point.velocities.at(0));
-        m_transmitData.targetVelocities.JointVelocity2 = encoder_resolution*rad2deg(trajectory_point.velocities.at(1));
-        m_transmitData.targetVelocities.JointVelocity3 = encoder_resolution*rad2deg(trajectory_point.velocities.at(2));
-        m_transmitData.targetVelocities.JointVelocity4 = encoder_resolution*rad2deg(trajectory_point.velocities.at(3));
-        m_transmitData.targetVelocities.JointVelocity5 = encoder_resolution*rad2deg(trajectory_point.velocities.at(4));
-        m_transmitData.targetVelocities.JointVelocity6 = encoder_resolution*rad2deg(trajectory_point.velocities.at(5));
-        m_transmitData.targetAcceleration.JointAcceleration1 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(0));
-        m_transmitData.targetAcceleration.JointAcceleration2 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(1));
-        m_transmitData.targetAcceleration.JointAcceleration3 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(2));
-        m_transmitData.targetAcceleration.JointAcceleration4 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(3));
-        m_transmitData.targetAcceleration.JointAcceleration5 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(4));
-        m_transmitData.targetAcceleration.JointAcceleration6 = encoder_resolution*rad2deg(trajectory_point.accelerations.at(5));
+        m_transmitData.targetPositions.JointAngle1 = encoder_resolution_factor*rad2deg(trajectory_point.positions.at(0));
+        m_transmitData.targetPositions.JointAngle2 = encoder_resolution_factor*rad2deg(trajectory_point.positions.at(1));
+        m_transmitData.targetPositions.JointAngle3 = encoder_resolution_factor*rad2deg(trajectory_point.positions.at(2));
+        m_transmitData.targetPositions.JointAngle4 = encoder_resolution_factor*rad2deg(trajectory_point.positions.at(3));
+        m_transmitData.targetPositions.JointAngle5 = encoder_resolution_factor*rad2deg(trajectory_point.positions.at(4));
+        m_transmitData.targetPositions.JointAngle6 = encoder_resolution_factor*rad2deg(trajectory_point.positions.at(5));
+        m_transmitData.targetVelocities.JointVelocity1 = encoder_resolution_factor*rad2deg(trajectory_point.velocities.at(0));
+        m_transmitData.targetVelocities.JointVelocity2 = encoder_resolution_factor*rad2deg(trajectory_point.velocities.at(1));
+        m_transmitData.targetVelocities.JointVelocity3 = encoder_resolution_factor*rad2deg(trajectory_point.velocities.at(2));
+        m_transmitData.targetVelocities.JointVelocity4 = encoder_resolution_factor*rad2deg(trajectory_point.velocities.at(3));
+        m_transmitData.targetVelocities.JointVelocity5 = encoder_resolution_factor*rad2deg(trajectory_point.velocities.at(4));
+        m_transmitData.targetVelocities.JointVelocity6 = encoder_resolution_factor*rad2deg(trajectory_point.velocities.at(5));
+        m_transmitData.targetAcceleration.JointAcceleration1 = encoder_resolution_factor*rad2deg(trajectory_point.accelerations.at(0));
+        m_transmitData.targetAcceleration.JointAcceleration2 = encoder_resolution_factor*rad2deg(trajectory_point.accelerations.at(1));
+        m_transmitData.targetAcceleration.JointAcceleration3 = encoder_resolution_factor*rad2deg(trajectory_point.accelerations.at(2));
+        m_transmitData.targetAcceleration.JointAcceleration4 = encoder_resolution_factor*rad2deg(trajectory_point.accelerations.at(3));
+        m_transmitData.targetAcceleration.JointAcceleration5 = encoder_resolution_factor*rad2deg(trajectory_point.accelerations.at(4));
+        m_transmitData.targetAcceleration.JointAcceleration6 = encoder_resolution_factor*rad2deg(trajectory_point.accelerations.at(5));
     }
 }
 
@@ -228,17 +248,14 @@ bool System::furtherTrajectoriePoints()
         return true;
 }
 
-globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector)
+void System::calcNewVelocity(globalData_typeDef_robotArm_posTransformation transformationVector)
 {
+    bool success;
     geometry_msgs::Pose startTarget;
     geometry_msgs::Pose endTarget;
-    std::vector<geometry_msgs::Pose> waypoints;
-    const double jump_threshold = 0.0;
-    const double eef_step = 0.01;
     tf2::Quaternion rotation;
     tf2::Quaternion orientation;
-    tf2::Quaternion newOrientation;
-    globalData_typeDef_robotArmVelocity velocity;
+    moveit::planning_interface::MoveItErrorCode errorCode;
 
     // normailze the the values that get send for the orientation scale it down to 20 percont of input value
     const double scale = 20;
@@ -246,9 +263,6 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
     // get the current positon. The position is neccessery. It seems it conntains important
     // inforamtion for further excuting of positions.
     startTarget = move_group->getCurrentPose().pose;
-
-    // save the first actual state as target
-    waypoints.push_back(startTarget);
 
     // copy all header data and overrite the actual position and orientation
     endTarget = startTarget;
@@ -277,27 +291,37 @@ globalData_typeDef_robotArmVelocity System::calcNewVelocity(globalData_typeDef_r
     endTarget.orientation.w = orientation.getW();
 
     // add the new offeset to the catual position
-    endTarget.position.x = endTarget.position.x + ((double) transformationVector.target_x/100);
-    endTarget.position.y = endTarget.position.y + ((double) transformationVector.target_y/100);
-    endTarget.position.z = endTarget.position.z + ((double) transformationVector.target_z/100);
+    endTarget.position.x = endTarget.position.x + ((double) transformationVector.target_x/1000);
+    endTarget.position.y = endTarget.position.y + ((double) transformationVector.target_y/1000);
+    endTarget.position.z = endTarget.position.z + ((double) transformationVector.target_z/1000);
 
-    waypoints.push_back(endTarget);
+    // calculate out of the endTarget the trajectory and store it in m_myPlan.trajectory
+    move_group->setPoseTarget(endTarget);
 
-    // calculate out of the waypoints the trajectory and store it in m_myPlan.trajectory
-    move_group->computeCartesianPath(waypoints, eef_step, jump_threshold, m_myPlan.trajectory_);
+    errorCode = move_group->plan(m_myPlan);
 
-    velocity.JointVelocity1 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(0);
-    velocity.JointVelocity2 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(1);
-    velocity.JointVelocity3 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(2);
-    velocity.JointVelocity4 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(3);
-    velocity.JointVelocity5 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(4);
-    velocity.JointVelocity6 = m_myPlan.trajectory_.joint_trajectory.points.at(0).velocities.at(5);
+    success = (errorCode == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
-    visual_tools->deleteAllMarkers();
-    // visual_tools->publishPath(waypoints, rvt::LIME_GREEN, rvt::SMALL);
-    // for (std::size_t i = 0; i < waypoints.size(); ++i)
-    //     visual_tools->publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rvt::SMALL);
-    visual_tools->trigger();
+    uint8_t size = m_myPlan.trajectory_.joint_trajectory.points.size();
+    
+    // if calcualtion was successfuly save the new trajectory in in m_myPlan 
+    if (success)
+    {
+        ROS_INFO("position planning successfuly!");
+   
+        // get joint Module Group of move_group current state and update joint_model_group
+        joint_model_group = move_group->getCurrentState()->getJointModelGroup(PLANNING_GROUP); 
+        visual_tools->deleteAllMarkers();
+        visual_tools->publishAxisLabeled(move_group->getPoseTargets().back().pose , "goal");
+        visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
+        visual_tools->trigger();
+
+        // reset up trajectory iterator to 0.
+        m_trajectoryIterator = 0;
+        // reset position reached for risng edge detection
+        m_trajectoryPointReached = true;
+    }
+
 }
 
 void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation transformationVector, bool collisionDetection)
@@ -330,16 +354,16 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
     target.pose.orientation.z = orientation.getZ();
     target.pose.orientation.w = orientation.getW();
 
-    target.pose.position.x = ((double) transformationVector.target_x/100);
-    target.pose.position.y = ((double) transformationVector.target_y/100);
-    target.pose.position.z = ((double) transformationVector.target_z/100);
+    target.pose.position.x = ((double) transformationVector.target_x/groundstation_resolution_factor);
+    target.pose.position.y = ((double) transformationVector.target_y/groundstation_resolution_factor);
+    target.pose.position.z = ((double) transformationVector.target_z/groundstation_resolution_factor);
 
     move_group->setPoseTarget(target);
 
     errorCode = move_group->plan(m_myPlan);
 
     success = (errorCode == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-    
+
     // if calcualtion was successfuly save the new trajectory in in m_myPlan 
     if (success)
     {
@@ -351,6 +375,11 @@ void System::calcNewTrajectory(globalData_typeDef_robotArm_posTransformation tra
         visual_tools->publishAxisLabeled(move_group->getPoseTargets().back().pose , "goal");
         visual_tools->publishTrajectoryLine(m_myPlan.trajectory_, joint_model_group);
         visual_tools->trigger();
+
+        // reset up trajectory iterator to 0.
+        m_trajectoryIterator = 0;
+        // reset position reached for risng edge detection
+        m_trajectoryPointReached = true;
     }
 
     // TODO add a return value with info about calculation. For example moveitErrorCode
@@ -397,6 +426,7 @@ void System::calcNewTrajectory(globalData_enumTypeDef_robotArmTeachedPos teached
 
             // reset up trajectory iterator to 0.
             m_trajectoryIterator = 0;
+            m_trajectoryPointReached = true;
         }
         // TODO add a return value with info about calculation. For example moveitErrorCode
     }
@@ -421,9 +451,9 @@ globalData_typeDef_robotArm_posTransformation System::getCartesianPosition()
     currentPose.target_roll = rad2deg(currentOrientation.at(0));    //roll
     currentPose.target_pitch = rad2deg(currentOrientation.at(1));   //pitch
     currentPose.target_yaw = rad2deg(currentOrientation.at(2));     //yaw
-    currentPose.target_x = currentPosition.pose.position.x * 100;
-    currentPose.target_y = currentPosition.pose.position.y * 100;
-    currentPose.target_z = currentPosition.pose.position.z * 100;
+    currentPose.target_x = currentPosition.pose.position.x * groundstation_resolution_factor;
+    currentPose.target_y = currentPosition.pose.position.y * groundstation_resolution_factor;
+    currentPose.target_z = currentPosition.pose.position.z * groundstation_resolution_factor;
 
     return currentPose;
 }
@@ -449,11 +479,12 @@ double System::deg2rad(double degree)
     return rad;
 }
 
-double System::calcVelocity(int16_t velocityPercentig)
+double System::calcVelocity(int16_t velocityPercentig, double maxvelocity)
 {
     double rc = 0.0;
 
-    rc = MAX_VELOCITY * (((double) velocityPercentig)/100.0) * pi * 2.0;
+    // 100 stands for 100 Percent
+    rc = maxvelocity * (((double) velocityPercentig)/100.0);
 
     return rc;
 }
@@ -493,6 +524,7 @@ void System::sendDataToArmCore()
 
     pub.publish(msg);
 
+    // if you want the fake trajectory get executed uncomment this 4 lines
     // if(m_transmitData.operationEnable)
     //     move_group->execute(m_myPlan);
     // else
@@ -553,24 +585,6 @@ void System::receiveDataCallback(const frost_robot_arm::ArmCoreToSystem::ConstPt
         if (m_newReceivedData.RobotArmPositionReached != m_oldReceivedData.RobotArmPositionReached)
             m_trajectoryPointReached = true;
     }
-    // // check if positionReached got deprecated
-    // if (m_newReceivedData.PositionReached[0] && m_newReceivedData.PositionReached[1] && m_newReceivedData.PositionReached[2] &&
-    //     m_newReceivedData.PositionReached[3] && m_newReceivedData.PositionReached[4] && m_newReceivedData.PositionReached[5])
-    // {
-
-    //     m_trajectoryPointReached = false;
-
-    //     for (int i = 0; i < 6; i++)
-    //     {
-    //         if (m_newReceivedData.PositionReached[i] != m_oldReceivedData.PositionReached[i])
-    //         {
-    //             m_trajectoryPointReached = true;
-    //             break;
-    //         }
-    //     }
-    //     // if (!std::equal(std::begin(m_newReceivedData.PositionReached), std::end(m_newReceivedData.PositionReached), std::begin(m_oldReceivedData.PositionReached)))
-    //     //     m_trajectoryPointReached = true;
-    // }
 }
 
 /************************** end transmitter receiver **************************

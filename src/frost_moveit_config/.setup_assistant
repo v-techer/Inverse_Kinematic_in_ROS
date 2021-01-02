@@ -8,4 +8,4 @@ moveit_setup_assistant_config:
   CONFIG:
     author_name: daniel kusmenko
     author_email: kusmenko@stud.fra-uas.de
-    generated_timestamp: 1605790437
+    generated_timestamp: 1606400375

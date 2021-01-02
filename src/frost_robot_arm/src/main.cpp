@@ -44,6 +44,9 @@ int main(int argc, char** argv)
     {
       /*if mode was changed update the statemachin for further processing */
       st.triggerModeChange(gnd.getCurrentMode());
+
+      //stop any movement
+      st.triggerStopMovement();
     }
 
     /* go in to current mode Axe Mode*/
@@ -264,7 +267,7 @@ int main(int argc, char** argv)
     if (st.currentModeJoyMode())
     {
       // set the arm core mode to position mode
-      sys.setArmCoreMode(ROBOTARMCOREMODE_VELOCITY);
+      sys.setArmCoreMode(ROBOTARMCOREMODE_POSITION);
 
       if (st.statusIsRunning())
       {
@@ -272,13 +275,43 @@ int main(int argc, char** argv)
         {
           sys.enableMovement();
 
-          sys.setTargetVelocitiy(sys.calcNewVelocity(gnd.getJoyMovement()));
+          if (sys.isTrajectoryPointReached())
+          {
+            // pop the position out of list if position was reached
+            sys.incrementTrajectoryIterator();
+
+            if(!sys.furtherTrajectoriePoints())
+            {
+              st.triggerPositionReached();
+            }
+          }
+          else
+          {
+            sys.setTargetTrajectoryPoint();
+          }
         }
         else
         {
           st.triggerStopMovement();
         }
         
+      }
+
+      if (st.statusIsReadyToRun())
+      {
+        if (gnd.movementIsEnabled())
+        {
+          if (gnd.newJoyMovement())
+          {
+            sys.calcNewVelocity(gnd.getJoyMovement());
+
+            st.triggerNextPosition();
+          }
+        }
+        else
+        {
+          st.triggerStopMovement();
+        }
       }
 
       if (st.statusIsStopped())
